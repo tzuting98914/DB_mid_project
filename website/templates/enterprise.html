@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block title %}Enterprise{% endblock %}
+{% block content %}
+<script type="text/javascript">
+	function display_alert(text)
+	  {
+	  alert(text)
+	  }
+	</script>
+	<h1 align = "center">事業單位列表</h1>
+	<table class="table">
+		<thead>
+		  <tr>
+			<th scope="col">序號</th>
+			<th scope="col">統一編號</th>
+			<th scope="col">公司名稱</th>
+			<th scope="col">資本額</th>
+			<th scope="col">代表人</th>
+			<th scope="col">地址</th>
+			<th scope="col">行業別</th>
+			<th scope="col">動作</th>
+		  </tr>
+		</thead>
+		<tbody>
+			{% for enterprise in enterpriseData %}
+			<tr>
+			  <td>{{ enterprise.序號 }}</td>
+			  <td> {{ enterprise.統一編號 }}</td>
+			  <td> {{ enterprise.公司名稱 }}</td>
+			  <td> {{ enterprise.資本額 }}</td>
+			  <td> {{ enterprise.代表人 }}</td>
+			  <td> {{ enterprise.地址 }}</td>
+			  <td> {{ enterprise.行業別 }}</td>
+			  <td><a href="{{ url_for('enterprise.update', eid=enterprise.事業單位編號) }}"><button class="btn btn-success">修改</button></a>
+				<a href="{{ url_for('enterprise.delect', eid=enterprise.事業單位編號) }}"><button class="btn btn-danger" onclick="display_alert('確定要刪除嗎')">刪除</button></a></td>	
+			</tr>
+			{% endfor %}
+		</tbody>
+	  </table>
+{% endblock %}

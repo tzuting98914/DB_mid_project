@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %} Project 工程{% endblock %}
+{% block content %}
+	<h1 align = "center">工程列表</h1>
+	<table class="table">
+		<thead>
+		  <tr>
+			<th scope="col"></th>
+			<th scope="col">工程名稱</th>
+			<th scope="col">業主名稱</th>
+		  </tr>
+		</thead>
+		<tbody>
+			{% for project in projectData %}
+			<tr>
+			  <td>{{ project.序號 }}</td>
+			  <td> {{ project.工程名稱 }}</td>
+			  <td>{{ project.業主名稱}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	  </table>
+{% endblock %}

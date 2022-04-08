@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}職災管理{% endblock %} 
+{% block head %}職災管理{% endblock %}
+{% block content %}
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+<a href="{{ url_for('views.viewWorkInjury') }}">
+    <button class="btn btn-info" type="button">新增職災資料</button>
+</a><br><br>
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>工程編號</text>
+                </label>
+                <input class="form-control" type="label-text" name="wid_search">
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>事業單位</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="estr_search">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>工程名稱</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="pstr_search">                
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>職災類型</text>
+                        </label><br>
+                        <select class="form-control" name="iid_search"> 
+                            <option value="" disabled selected>請選擇職災類型...</option>
+                            {% for info in injurytype_data %}
+                                <option value="{{ info.injuryname }}">{{ info.injuryname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>勞動檢查機構</text>
+                        </label><br>
+                        <select class="form-control" name="agencyname_search">
+                            <option value="" disabled selected>請選擇勞動檢查機構...</option>
+                            {% for info in agency_data %}
+                                <option value="{{ info.agencyname }}">{{ info.agencyname }}</option>
+                            {% endfor %}
+                        </select> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋職災
+        </button> 
+    </form>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">職災列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>編號</th>
+                            <th>工程名稱</th>
+                            <th>發生日期</th>
+                            <th>人數</th>
+                            <th>災害類型</th>
+                            <th>事業單位</th>
+                            <th>勞動檢查機構</th>
+                            <th>編輯</th>
+                            <th>刪除</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>編號</th>
+                            <th>工程名稱</th>
+                            <th>發生日期</th>
+                            <th>人數</th>
+                            <th>災害類型</th>
+                            <th>事業單位</th>
+                            <th>勞動檢查機構</th>
+                            <th>編輯</th>
+                            <th>刪除</th>
+                        </tr>
+                    </tfoot>  
+                    <col width="3%"/>
+                    <col width="15%"/>
+                    <col width="10%"/>
+                    <col width="5%"/>                  
+                    <col width="10%"/>                  
+                    <col width="10%"/>                  
+                    <col width="10%"/>                  
+                    <col width="5%"/>                  
+                    <col width="5%"/>                  
+                    <tbody>                                               
+                        {% for info in info_data %}
+                            <tr>
+                                <td> {{ info.wid }}</td>
+                                <td> {{ info.projectname }}</td>
+                                <td> {{ info.wdate }}</td>
+                                <td> {{ info.num }}</td>
+                                <td> {{ info.injuryname }}</td>
+                                <td> {{ info.enterprisename }}</td>
+                                <td> {{ info.agencyname }}</td>
+                                <td>
+                                    <button class="btn btn-info" type="submit" value="{{info.wid}}" name="edit">
+                                        <i class='fa fa-edit'></i>
+                                    </button>                                
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger" type="submit" value="{{info.wid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ info.wid }}\' 工程的職災嗎？'))">                               
+                                        <i class='fa fa-trash-alt'></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <script language="javascript">
+        $(document).ready( function () {
+            $('#workInjuryTable').DataTable();
+        } );
+    </script>
+
+{% endblock %}

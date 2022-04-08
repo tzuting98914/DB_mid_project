@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}職災統計{% endblock %} 
+{% block head %}職災統計{% endblock %}
+
+
+{% block head_link %}
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<link rel="stylesheet" href=" {{ url_for('static',  filename='./template.css') }} ">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.1.2/echarts.min.js" integrity="sha512-ppWbHq6q2f7HAwS481w6qikuC0XEeBnmkRg6KWnWg3zSIbJwWWBgsCDMAxzSB7SVqXzWwSYQ2s8TSJKjnaikMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!--
+<link href="../static/offcanvas.css" rel="stylesheet">
+<script src="../static/offcanvas.js"></script>
+-->
+
+{% endblock %}
+
+{% block content %}
+
+<div class="my-3 p-3 bg-body rounded shadow-sm">
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">罹災人數月份統計</button>
+          <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">職災類別統計</button>
+          <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">區域職災排名排名</button>        
+        </div>
+      </nav>
+    </div>
+    <br/>
+    <!-- 放各種圖的地方 -->
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+        <center> 
+          <div id="maina" class="container-fluid" style="width:1200px;height:500px"></div>
+        </center>
+      </div>
+      <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <center>
+          <div id="mainb" class="container-fluid" style="width: 600px;height:500px"></div>
+        </center>
+      </div>
+      <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+        <center>
+          <div id="mainc" class="container-fluid" style="width: 1200px;height:500px"></div>
+        </center>
+      </div>
+    </div>
+  </div>
+
+  
+  <script>
+    // 以長條圖與折線圖分析各月訂單
+    var chartDoma = document.getElementById('maina');
+    var myCharta = echarts.init(chartDoma);
+    
+    var revenue = {{revenue|tojson}}; // 每月人數
+    var count = {{dataa|tojson}}; // 每月件數
+
+    var optiona = {
+      title: {
+        text: '各月職災數量分析（人數）'
+      },
+      tooltip: {},
+      legend: {
+        data: ['職災數量']
+      },
+      xAxis: {
+        data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+      },
+      yAxis: {},
+      series: [{
+        name: '罹災人數',
+        type: 'bar',
+        symbolSize: 16,
+        data: revenue,
+        markPoint: {
+          data: [
+            {type: 'max', name: '罹災最高月份'},
+            {type: 'min', name: '罹災最低月份'}
+          ]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          textStyle: {
+            fontSize: 15
+          }
+        }
+      }
+      ],
+      legend: {
+        show: true
+      },
+    };
+
+    var chartDomb = document.getElementById('mainb');
+    var myChartb = echarts.init(chartDomb);
+    var datab = {{datab|tojson}};
+    var optionb = {
+      title: {
+        text: '職災類別分析（件數）',
+        left: 'center',
+        top: 'center'
+      },
+      tooltip: {},
+      legend: {
+        orient: 'vertical',
+        x: 'left',
+        data: ['BOOK', 'CD', 'DVD']
+      },
+      series: [
+        {
+          type: 'pie',
+          data: datab,          
+          radius: ['40%', '70%']
+        }
+      ]
+    };
+
+    // 各區職災統計
+    var chartDomc = document.getElementById('mainc');
+    var myChartc = echarts.init(chartDomc);
+    var datac = {{datac|tojson}};
+    var nameList = {{nameList|tojson}};
+    var countList = {{countList|tojson}};
+    var optionc = {
+      title: {
+        text: '區域職災件數排名'
+      },
+      xAxis: {
+        max: 'dataMax'
+      },
+      yAxis: {
+        type: 'category',
+        data: nameList,
+        inverse: true,
+        animationDuration: 300,
+        animationDurationUpdate: 300,
+        max: 4
+      },
+      tooltip: {},
+      series: [
+        {
+          realtimeSort: true,
+          name: '罹災人數',
+          type: 'bar',
+          data: datac,
+          label: {
+            show: true,
+            position: 'right',
+            valueAnimation: true
+          }
+        },
+        {
+          realtimeSort: true,
+          name: '職災件數',
+          type: 'bar',
+          data: countList,
+          label: {
+            show: true,
+            position: 'right',
+            valueAnimation: true
+          }
+        }
+        ],
+      legend: {
+        show: true
+      },
+      animationDuration: 3000,
+      animationDurationUpdate: 3000,
+      animationEasing: 'linear',
+      animationEasingUpdate: 'linear'
+    };
+
+    function run() {
+      myChartc.setOption({
+        series: [
+          {
+            type: 'bar',
+            datac
+          }
+        ]
+      });
+    } 
+  
+    setTimeout(function() {
+      run();
+    }, 0);
+          
+    setInterval(function() {
+      update();
+    }, 3000);
+    
+  
+    optiona && myCharta.setOption(optiona);
+    optionb && myChartb.setOption(optionb);
+    optionc && myChartc.setOption(optionc);
+        
+  </script>
+
+{% endblock %}

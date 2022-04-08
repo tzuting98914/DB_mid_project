@@ -1,22 +1,89 @@
-{% extends "base.html" %} {% block title %} Project 工程{% endblock %}
+{% extends "base.html" %} 
+{% block title %}工程管理{% endblock %}
+{% block head %}工程管理{% endblock %}
+
 {% block content %}
-	<h1 align = "center">工程列表</h1>
-	<table class="table">
-		<thead>
-		  <tr>
-			<th scope="col"></th>
-			<th scope="col">工程名稱</th>
-			<th scope="col">業主名稱</th>
-		  </tr>
-		</thead>
-		<tbody>
-			{% for project in projectData %}
-			<tr>
-			  <td>{{ project.序號 }}</td>
-			  <td> {{ project.工程名稱 }}</td>
-			  <td>{{ project.業主名稱}}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	  </table>
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+<a href="{{ url_for('project.new') }}">
+    <button class="btn btn-info" type="button">新增工程資料</button>
+</a><br><br>
+
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>工程編號</text>
+                </label>
+                <input class="form-control" type="label-text" name="pId_search">
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>工程名稱</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="pName_search">                
+                    </div>
+                </div>
+				<div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>業主名稱</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="eId_search">                
+                    </div>
+                </div>
+				
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋工程
+        </button> 
+    </form>
+</div>
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">工程列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+						  <th scope="col">序號</th>
+						  <th scope="col">工程名稱</th>
+						  <th scope="col">業主名稱</th>
+						</tr>
+					  </thead>
+					  	<col width="5%"/>
+						<col width="55%"/>
+						<col width="40%"/>
+						<tbody>
+							{% for project in projectData %}
+								<tr>
+								<td>{{ project.序號 }}</td>
+								<td> {{ project.工程名稱 }}</td>
+								<td>{{ project.業主名稱}}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+				</table>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

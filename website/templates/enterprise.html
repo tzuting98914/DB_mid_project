@@ -1,39 +1,149 @@
-{% extends "base.html" %} {% block title %}Enterprise{% endblock %}
+{% extends "base.html" %} 
+{% block title %}事業單位管理{% endblock %} 
+{% block head %}事業單位管理{% endblock %}
+
 {% block content %}
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+<a href="{{ url_for('views.viewWorkInjury') }}">
+    <button class="btn btn-info" type="button">新增事業單位資料</button>
+</a><br><br>
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>事業單位編號</text>
+                </label>
+                <input class="form-control" type="label-text" name="eId_search">
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>統一編號</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="eNo_search">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>公司名稱</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="eName_search">                
+                    </div>
+                </div>
+				<div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>資本額</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="eCap_search">                
+                    </div>
+                </div>
+				<div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>代表人</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="ePr_search">                
+                    </div>
+                </div>
+				<div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>地址</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="eAdd_search">                
+                    </div>
+                </div>
+				<div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>行業別</text>
+                        </label><br>
+                        <select class="form-control" name="inId_search"> 
+                            <option value="" disabled selected>請選擇行業別...</option>
+                            {% for info in injurytype_data %}
+                                <option value="{{ info.injuryname }}">{{ info.injuryname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋事業單位
+        </button> 
+    </form>
+</div>
+
+
 <script type="text/javascript">
 	function display_alert(text)
 	  {
 	  alert(text)
 	  }
-	</script>
-	<h1 align = "center">事業單位列表</h1>
-	<table class="table">
-		<thead>
-		  <tr>
-			<th scope="col">序號</th>
-			<th scope="col">統一編號</th>
-			<th scope="col">公司名稱</th>
-			<th scope="col">資本額</th>
-			<th scope="col">代表人</th>
-			<th scope="col">地址</th>
-			<th scope="col">行業別</th>
-			<th scope="col">動作</th>
-		  </tr>
-		</thead>
-		<tbody>
-			{% for enterprise in enterpriseData %}
-			<tr>
-			  <td>{{ enterprise.序號 }}</td>
-			  <td> {{ enterprise.統一編號 }}</td>
-			  <td> {{ enterprise.公司名稱 }}</td>
-			  <td> {{ enterprise.資本額 }}</td>
-			  <td> {{ enterprise.代表人 }}</td>
-			  <td> {{ enterprise.地址 }}</td>
-			  <td> {{ enterprise.行業別 }}</td>
-			  <td><a href="{{ url_for('enterprise.update', eid=enterprise.事業單位編號) }}"><button class="btn btn-success">修改</button></a>
-				<a href="{{ url_for('enterprise.delect', eid=enterprise.事業單位編號) }}"><button class="btn btn-danger" onclick="display_alert('確定要刪除嗎')">刪除</button></a></td>	
-			</tr>
-			{% endfor %}
-		</tbody>
-	  </table>
+</script>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">職災列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+						  <th scope="col">序號</th>
+						  <th scope="col">統一編號</th>
+						  <th scope="col">公司名稱</th>
+						  <th scope="col">資本額</th>
+						  <th scope="col">代表人</th>
+						  <th scope="col">地址</th>
+						  <th scope="col">行業別</th>
+						  <th scope="col">動作</th>
+						</tr>
+					  </thead>
+					  <col width="5%"/>
+						<col width="8%"/>
+						<col width="20%"/>
+						<col width="9%"/>                  
+						<col width="7%"/>                  
+						<col width="25%"/>                  
+						<col width="16%"/>                  
+						<col width="10%"/>
+						<tbody>
+							{% for enterprise in enterpriseData %}
+							<tr>
+							  <td>{{ enterprise.序號 }}</td>
+							  <td> {{ enterprise.統一編號 }}</td>
+							  <td> {{ enterprise.公司名稱 }}</td>
+							  <td> {{ enterprise.資本額 }}</td>
+							  <td> {{ enterprise.代表人 }}</td>
+							  <td> {{ enterprise.地址 }}</td>
+							  <td> {{ enterprise.行業別 }}</td>
+							  <td><a href="{{ url_for('enterprise.update', eid=enterprise.事業單位編號) }}"><button class="btn btn-success">修改</button></a>
+								<a href="{{ url_for('enterprise.delect', eid=enterprise.事業單位編號) }}"><button class="btn btn-danger" onclick="display_alert('確定要刪除嗎')">刪除</button></a></td>	
+							</tr>
+							{% endfor %}
+						</tbody>
+				</table>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

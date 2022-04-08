@@ -25,3 +25,12 @@ def showproject():
 		project_list.append(project)
 	# print(len(allEnterprise))
 	return render_template("project.html",projectData = project_list)
+
+@project.route('/project/new', methods=['GET','POST'])
+def new():
+	# request得到的data
+	pid = request.values.get('pid')
+	# print(eid)
+	# sql = 'UPDATE ENTERPRISE SET '
+	# cursor.execute(sql)
+	return render_template("project_new.html")

@@ -37,7 +37,12 @@
                         <label class="small mb-1">
                             <text>業主名稱</text>
                         </label><br>
-                        <input class="form-control" type="label-text" name="eId_search">                
+                        <select class="form-control" name="inId_search"> 
+                            <option value="" disabled selected>請選擇業主...</option>
+                            {% for info in injurytype_data %}
+                                <option value="{{ info.injuryname }}">{{ info.injuryname }}</option>
+                            {% endfor %}
+                        </select>              
                     </div>
                 </div>
 				

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash
-from flask_login import current_user
+from flask_login import current_user,login_required
 from website import connectDB
 
 connection = connectDB()
@@ -7,14 +7,16 @@ cursor = connection.cursor()
 
 enterprise = Blueprint('enterprise', __name__)
 
+
 @enterprise.route('/enterprise')
+@login_required
 def showEnterprise():
 	
 	sql = 'SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE ENTERPRISENO IS NOT NULL AND ROWNUM <= 10'
 	
 	cursor.execute(sql)
 	allEnterprise = cursor.fetchall()
-	
+	# print(current_user.role)
 	Enterprise_list = []
 	count = 0
 	for data in allEnterprise:
@@ -46,3 +48,12 @@ def update():
 @enterprise.route('/enterprise/delect')
 def delect():
 	return render_template("home.html", user=current_user)
+
+@enterprise.route('/enterprise/new', methods=['GET','POST'])
+def new():
+	# request得到的data
+	pid = request.values.get('pid')
+	# print(eid)
+	# sql = 'UPDATE ENTERPRISE SET '
+	# cursor.execute(sql)
+	return render_template("enterprise_new.html")

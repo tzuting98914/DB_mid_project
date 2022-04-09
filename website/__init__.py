@@ -34,11 +34,13 @@ def create_app():
 		# print(mid)
 		user = User()
 		user.id = mid
-		cursor.prepare('SELECT MID, ACCOUNT FROM USERACCOUNT WHERE MID = (:MID) ')
+		cursor.prepare('SELECT MID,ACCOUNT,USERNAME,ROLE FROM USERACCOUNT WHERE MID = (:MID) ')
 		cursor.execute(None, {'MID':mid})
 		data = cursor.fetchone()
 		user.mid = data[0]
 		user.account = data[1]
+		user.username = data[2]
+		user.role = data[3]
 		return user 
 
 	return app

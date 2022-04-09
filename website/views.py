@@ -154,11 +154,11 @@ def index():
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data)
+                                        agency_data = agency_data, user=current_user)
 
 @views.route('/home')
 def home():
-    return render_template("home.html")
+    return render_template("home.html", user=current_user)
             
 # 新增職災基本資訊
 @views.route('/viewWorkInjury', methods=['GET', 'POST'])
@@ -244,7 +244,7 @@ def viewWorkInjury():
                 if info != None:
                     return redirect(url_for('views.viewWorkInjury', data=info)) 
                 else:               
-                    return redirect(url_for('views.index'))
+                    return redirect(url_for('views.index', user=current_user))
 
         else:
             print("編輯職災資訊")          

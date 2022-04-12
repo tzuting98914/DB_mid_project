@@ -9,13 +9,16 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-<a href="{{ url_for('enterprise.new') }}">
-    <button class="btn btn-info" type="button">新增事業單位資料</button>
-</a><br><br>
+<form method="get" action={{ url_for('enterprise.update_or_new') }}>
+<button class="btn btn-info" type="submit" name="actionType" value="add">
+    新增事業單位資料
+</button>
+</form>
+<br><br>
 
 <div class="card mb-4 py-3 border-left-primary">
     <div class="card-body">
-        <form method="post">
+        <form method="post" action={{ url_for('enterprise.search') }}>
             <div class="form-group">
                 <label class="small mb-1">
                     <text>事業單位編號</text>
@@ -68,7 +71,7 @@
                         <label class="small mb-1">
                             <text>行業別</text>
                         </label><br>
-                        <select class="form-control" name="inId_search"> 
+                        <select class="form-control" name="inName_search"> 
                             <option value="" disabled selected>請選擇行業別...</option>
                             {% for data in industryData %}
                                 <option value="{{ data.industryName }}">{{ data.industryName }}</option>
@@ -82,29 +85,32 @@
             style = "margin:0% 2% 0% 2%;"
             class="btn btn-info" 
             type="submit" 
-            name="search" >
+            name="search">
             搜尋事業單位
-        </button> 
+        </button>
     </form>
 </div>
 
 
 <script type="text/javascript">
-	function display_alert(text)
-	  {
-	  alert(text)
-	  }
+    function disp_confirm()
+    {
+    var r=confirm("Press a button")
+    if (r==false){
+        return true
+      }
+    }
 </script>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">職災列表</h6>
+        <h6 class="m-0 font-weight-bold text-primary">事業單位列表</h6>
     </div>
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='post'>
+            <form  method='get' action = {{ url_for('enterprise.update_or_new') }}>
                 <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
 					<thead>
 						<tr>
@@ -115,7 +121,8 @@
 						  <th scope="col">代表人</th>
 						  <th scope="col">地址</th>
 						  <th scope="col">行業別</th>
-						  <th scope="col">動作</th>
+						  <th scope="col">修改</th>
+                          <th scope="col">刪除</th>
 						</tr>
 					  </thead>
 					  <col width="5%"/>
@@ -125,7 +132,8 @@
 						<col width="7%"/>                  
 						<col width="25%"/>                  
 						<col width="16%"/>                  
-						<col width="10%"/>
+						<col width="5%"/>
+                        <col width="5%"/>
 						<tbody>
 							{% for enterprise in enterpriseData %}
 							<tr>
@@ -136,8 +144,9 @@
 							  <td> {{ enterprise.代表人 }}</td>
 							  <td> {{ enterprise.地址 }}</td>
 							  <td> {{ enterprise.行業別 }}</td>
-							  <td><a href="{{ url_for('enterprise.update', eid=enterprise.事業單位編號) }}"><button class="btn btn-success">修改</button></a>
-								<a href="{{ url_for('enterprise.delect', eid=enterprise.事業單位編號) }}"><button class="btn btn-danger" onclick="display_alert('確定要刪除嗎')">刪除</button></a></td>	
+                                
+                              <td><button class="btn btn-info" type="submit" name="edit" value={{ enterprise.事業單位編號 }}><i class='fa fa-edit'></i></button></td>
+							  <td> <button class="btn btn-danger" type="submit" value="{{enterprise.事業單位編號}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.公司名稱 }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
 							</tr>
 							{% endfor %}
 						</tbody>

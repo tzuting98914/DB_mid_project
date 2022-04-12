@@ -123,7 +123,7 @@ def index():
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data)
+                                        agency_data = agency_data, user = current_user)
 
     
     if 'delete' in request.values: #要刪除            
@@ -147,18 +147,18 @@ def index():
     # 進入修改頁面
     elif 'edit' in request.values: 
             wid = request.values.get('edit')                        
-            return redirect(url_for('views.viewWorkInjury', wid=wid))
+            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
     
     info_data = workInjury()        
     return render_template("home.html", info_data=info_data,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data, user=current_user)
+                                        agency_data = agency_data, user = current_user)
 
 @views.route('/home')
 def home():
-    return render_template("home.html", user=current_user)
+    return render_template("home.html", user = current_user)
             
 # 新增職災基本資訊
 @views.route('/viewWorkInjury', methods=['GET', 'POST'])
@@ -242,9 +242,9 @@ def viewWorkInjury():
                 
                 # todo: 剛新增完抓不到資料
                 if info != None:
-                    return redirect(url_for('views.viewWorkInjury', data=info)) 
+                    return redirect(url_for('views.viewWorkInjury', data=info, user = current_user)) 
                 else:               
-                    return redirect(url_for('views.index', user=current_user))
+                    return redirect(url_for('views.index', user = current_user))
 
         else:
             print("編輯職災資訊")          
@@ -274,7 +274,7 @@ def viewWorkInjury():
             info = show_workinjury(wid)
             print("info__after update",info)
             
-            return redirect(url_for('views.viewWorkInjury', wid=wid))
+            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
     else:
         # 編輯頁面
         if 'wid' in request.args:        
@@ -285,14 +285,14 @@ def viewWorkInjury():
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data)
+                                        agency_data = agency_data, user = current_user)
         else:
             # 進入新增頁面    
             return render_template("viewWorkInjury.html",    
                                             enterprise_data = enterprise_data,
                                             project_data = project_data,
                                             injurytype_data = injurytype_data,
-                                            agency_data = agency_data)
+                                            agency_data = agency_data, user = current_user)
 
 # 根據職災編號找資料
 def show_workinjury(wid):    
@@ -514,5 +514,5 @@ def plot():
                             dataa = dataa, datab = datab,
                             datac = datac, 
                             nameList = nameList, 
-                            countList = countList
+                            countList = countList, user = current_user
                            )

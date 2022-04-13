@@ -11,7 +11,6 @@ cursor = connection.cursor()
 views = Blueprint('views', __name__)
 
 def test():
-
     sql = "SELECT * FROM workinjury_test FETCH FIRST 3 ROWS ONLY"
     cursor.prepare(sql)
     cursor.execute(None)
@@ -42,7 +41,24 @@ def index():
     injurytype_data = injurytype()
     agency_data = agency()
     
-    # TODO: 除了勞檢單位之外，其他地方的查詢怪怪的 
+    # 刪除職災
+    if 'delete' in request.values:            
+        wid = request.values.get('delete')
+        print("delete", wid)
+        
+        if('w' in wid):
+            cursor.prepare('DELETE FROM workinjury WHERE wid = :wid ')
+            cursor.execute(None, {'wid': wid})
+            connection.commit() # 把這個刪掉
+        else:
+            flash('正式的職災資料，沒辦法刪除喔', category='error') 
+                    
+    # 修改職災
+    elif 'edit' in request.values: 
+            wid = request.values.get('edit')                        
+            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
+
+    # 查詢資料
     if 'search' in request.values:
         wid_search = request.values.get('wid_search')
         estr_search = request.values.get('estr_search')
@@ -56,13 +72,13 @@ def index():
         iid_search = ('%' + iid_search+ '%') if iid_search != None else "%%"        
         agencyname_search = ('%' + agencyname_search+ '%') if agencyname_search != None else '%%'
 
-        print(
-            wid_search+"___"+
-            estr_search+"___"+
-            pstr_search+"___"+
-            iid_search+"___"+
-            agencyname_search
-        )                        
+        # print(
+        #     wid_search+"___"+
+        #     estr_search+"___"+
+        #     pstr_search+"___"+
+        #     iid_search+"___"+
+        #     agencyname_search
+        # )                        
         sql = """
                 SELECT 
                     w.wid,p.pid,i.iid, w.wdate,
@@ -82,21 +98,10 @@ def index():
                     i.injuryname LIKE : iid_search AND
                     w.agencyname LIKE : agencyname_search
                                         
-                ORDER BY p.pid FETCH FIRST 100 ROWS ONLY
+                ORDER BY p.pid FETCH FIRST 50 ROWS ONLY
             """
                         
         cursor.prepare(sql)
-        # cursor.execute(None, {
-        #     'estr_search':estr_search,
-        #     'agencyname_search': agencyname_search,       
-        #     })
-        
-        # w.wid LIKE : wid_search AND
-        # e.enterprisename LIKE :estr_search AND
-        # p.projectname LIKE :pstr_search AND
-        # i.injuryname LIKE : iid_search AND        
-        # w.agencyname LIKE : agencyname_search
-
         cursor.execute(None, {
             'wid_search': wid_search, 'estr_search':estr_search, 
             'pstr_search':pstr_search, 'iid_search':iid_search,
@@ -118,43 +123,18 @@ def index():
                 'agencyname': i[8],
             }
             info_data.append(info)
-        # print("info_data",info_data)
-        return render_template("home.html", info_data=info_data,    
-                                        enterprise_data = enterprise_data,
-                                        project_data = project_data,
-                                        injurytype_data = injurytype_data,
-                                        agency_data = agency_data, user = current_user)
-
-    
-    if 'delete' in request.values: #要刪除            
-        wid = request.values.get('delete')
-        print("delete", wid)
-
-        # todo: 職災刪除條件待討論
-        # cursor.prepare('SELECT * FROM workinjury WHERE wid=:wid')
-        # cursor.execute(None, {'wid':wid})
-        # data = cursor.fetchone() #可以抓一筆就好了，假如有的話就不能刪除        
-        # if(data != None):
-        #     flash('faild')
+            
+    # 剛進入主頁
+    else:
+        # 查看測試資料
+        info_data = workInjury()
         
-        if('w' in wid):
-            cursor.prepare('DELETE FROM workinjury WHERE wid = :wid ')
-            cursor.execute(None, {'wid': wid})
-            connection.commit() # 把這個刪掉
-        else:
-            flash('正式的職災資料，沒辦法刪除喔', category='error') 
-                    
-    # 進入修改頁面
-    elif 'edit' in request.values: 
-            wid = request.values.get('edit')                        
-            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
-    
-    info_data = workInjury()        
     return render_template("home.html", info_data=info_data,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data, user = current_user)
+                                        agency_data = agency_data, 
+                                        user = current_user)
 
 @views.route('/home')
 def home():
@@ -162,19 +142,17 @@ def home():
             
 # 新增職災基本資訊
 @views.route('/viewWorkInjury', methods=['GET', 'POST'])
+@login_required
 def viewWorkInjury():
     
     enterprise_data = enterprise()
     project_data = project()  
     injurytype_data = injurytype()
     agency_data = agency()
-    
-    # print("project_data",project_data)
-    # print("enterprise_data",enterprise_data)
-    # print("agency_data",agency_data)
-            
+                
     # 新增職災資料
-    if request.method == 'POST':         
+    if request.method == 'POST':    
+             
         # 抓取form資料
         eid = request.values.get('eid')
         pid = request.values.get('pid')
@@ -238,17 +216,16 @@ def viewWorkInjury():
                 print("新增資料成功")
                 flash('新增資料成功！', category='success')
                 
-                info = show_workinjury(wid)
-                
-                # todo: 剛新增完抓不到資料
+                info = show_workinjury(wid)                
+                wid = info['wid']                                
                 if info != None:
-                    return redirect(url_for('views.viewWorkInjury', data=info, user = current_user)) 
+                    return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
                 else:               
-                    return redirect(url_for('views.index', user = current_user))
+                    flash('資料庫發生問題，請聯繫管理員', category='error')
 
         else:
             print("編輯職災資訊")          
-            wid = request.args['wid']  
+            wid = request.args['wid']                        
             sql = """
                     UPDATE workinjury 
                     SET 
@@ -263,16 +240,18 @@ def viewWorkInjury():
                         address=:address
                     WHERE wid=:wid
                 """
+                
             cursor.prepare(sql)
             cursor.execute(None, {
                 'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
                 'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
                 'num':num , 'note':note, 'address':address            
                 })
+                        
             connection.commit()
             flash('更新資料成功！', category='success')
             info = show_workinjury(wid)
-            print("info__after update",info)
+            # print("info__after update",info)
             
             return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
     else:
@@ -280,7 +259,6 @@ def viewWorkInjury():
         if 'wid' in request.args:        
             wid = request.args['wid']
             info = show_workinjury(wid)
-            print("進入編輯頁面")
             return render_template("viewWorkInjury.html", data=info,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
@@ -313,15 +291,11 @@ def show_workinjury(wid):
                 ON w.pid = p.pid                    
                 LEFT JOIN injurytype i
                 ON w.iid = i.iid
-
-            WHERE w.wid = :wid
-        """
-    cursor.prepare(sql)
-    cursor.execute(None, {'wid': wid})
-
+            WHERE w.wid = """ + "\'" + wid + "\'"
+        
+    cursor.execute(sql)
     data = cursor.fetchone()     
     if data != None:
-        data = [i.strip() if isinstance(i, str) else i for i in data]    
         info = {
                 'wid': data[0],
                 'pid': data[1],

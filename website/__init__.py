@@ -8,9 +8,8 @@ class User(UserMixin):
 
 def create_app():
 	app = Flask(__name__)
-	# 設定flask密鑰(最好是亂碼)
 	app.config['SECRET_KEY'] = 'sdojrie'
-	cx_Oracle.init_oracle_client(lib_dir=r'C:\Users\Ziting\Downloads\instantclient_21_3')
+	cx_Oracle.init_oracle_client(lib_dir='../../instantclient_19_8')
 	connection = connectDB()
 	cursor = connection.cursor()
 	

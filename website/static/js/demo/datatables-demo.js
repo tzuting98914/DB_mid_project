@@ -1,4 +1,12 @@
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
-  $('#dataTable').DataTable();
+  $('#workInjuryTable').DataTable();
+});
+
+$(document).ready(function() {
+  $('#enterpriseTable').DataTable();
+});
+
+$(document).ready(function() {
+  $('#projectTable').DataTable();
 });

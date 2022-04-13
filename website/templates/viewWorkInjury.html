@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}職災新增{% endblock %} 
-{% block head %}職災新增{% endblock %}
 
+{% block title %}
+    {% if data %}職災編輯{% else %}職災新增{% endif %}
+{% endblock %} 
+
+{% block head %}
+    {% if data %}職災編輯{% else %}職災新增{% endif %} 
+{% endblock %}
 
 {% block content %}
 
@@ -40,7 +45,8 @@
                 <label class="small mb-1">
                     <text>工程名稱</text>
                 </label><br>  
-                                                                  
+                       
+               
                 <select class="form-control" name="pid" required>
                     <option value="" disabled selected>請選擇工程名稱...</option>
                     {% for info in project_data %}
@@ -50,9 +56,10 @@
                             <option value="{{ info.pid }}">{{ info.projectname }}</option>
                         {% endif %}
                     {% endfor %}
-                </select>                 
+                </select>    
                 
-                <!-- todo: 還沒辦法隱藏VAlue 
+                <!-- todo: 還沒辦法隱藏VAlue -->
+                 <!-- 
                 <input type="text" name="pid" list="pidName" class="form-control">
                 <datalist id="pidName">
                     <option value="" disabled selected>請選擇工程名稱...</option>
@@ -60,7 +67,7 @@
                         <option value="{{ info.pid }}">{{ info.projectname }}</option>
                     {% endfor %}
                 </datalist>
-                -->
+            --> 
             </div>
 
             <div class="form-row">
@@ -138,7 +145,9 @@
                     <text>肇事位置</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="location">{{ data.location }}</textarea>
+                        <textarea class="form-control" rows="2" name="location">
+                            {{ data.location if data.location is not none }}
+                        </textarea>
                     {% else %}
                         <textarea class="form-control" rows="2" name="location"></textarea>
                     {% endif %}
@@ -149,7 +158,9 @@
                     <text>肇事地址</text>
                 </label>                                                    
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="address">{{ data.address }}</textarea> 
+                        <textarea class="form-control" rows="2" name="address">
+                            {{ data.address if data.address is not none }}
+                        </textarea> 
                     {% else %}
                         <textarea class="form-control" rows="2" name="address"></textarea>
                     {% endif %}
@@ -160,24 +171,23 @@
                     <text>備註</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="note">{{ data.note }}</textarea>
+                        <textarea class="form-control" rows="2" name="note">
+                            {{ data.note if data.note is not none }}
+                        </textarea>
                     {% else %}
                         <textarea class="form-control" rows="2" name="note"></textarea>
                     {% endif %}
             </div>     
             
-            
-            <button class="btn btn-info" type="submit" name="submitBtn" value="add">
-                新增資料
-            </button> 
-
-            <button class="btn btn-info" type="submit" name="submitBtn" value="edit">
-                編輯資料
-            </button> 
+            {% if data %}
+                <button class="btn btn-info" type="submit" name="submitBtn" value="edit">編輯資料</button>
+            {% else %}
+                <button class="btn btn-info" type="submit" name="submitBtn" value="add">新增資料</button>
+            {% endif %}
 
             <a href="{{ url_for('views.index') }}">
                 <button class="btn btn-info" type="button">回上一頁</button>
             </a>
         </form>        
-    </div>
+    </div>    
 {% endblock %}

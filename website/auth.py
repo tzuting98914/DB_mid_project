@@ -27,7 +27,7 @@ def login():
 				# print(userdata[4])
 				login_user(user,remember = True)
 				flash('登入成功', category='success')
-				return redirect(url_for('views.home'))
+				return redirect(url_for('views.index'))
 			else:
 				flash('密碼錯誤', category='error')
 		else:

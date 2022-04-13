@@ -3,7 +3,6 @@
 {% block head %}工程管理{% endblock %}
 
 {% block content %}
-
 <link 
     href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
     rel="stylesheet">
@@ -94,7 +93,31 @@
 								<tr>
 								<td>{{ project.count }}</td>
 								<td> {{ project.projectname }}</td>
-								<td>{{ project.enterpriseName}}</td>
+								<td><!-- Button trigger modal -->
+                                    <a data-bs-toggle="modal" data-bs-target="#showModal{{ project.count }}">
+                                        {{ project.projectname }}
+                                    </a>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="showModal{{ project.count }}" tabindex="-1" aria-labelledby="showModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="showModalLabel">業主詳細資訊</h5>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>工程名稱：{{ project.projectname }}</p>
+                                              <p>業主名稱：{{ project.enterpriseName }}</p>
+                                              <p>統一編號：{{ project.enterpriseNo }}</p>
+                                              <p>資本額：{{ project.capital }}</p>
+                                              <p>代表人：{{ project.principal }}</p>
+                                              <p>地址：{{ project.address }}</p>
+                                          </div>
+                                          <div class="modal-footer" >
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div></td>
                                 {% if (user.role == 1 )%}  
                                     <td><button class="btn btn-info" type="submit" name="edit" value="{{ project.pid }}"><i class='fa fa-edit'></i></button></td>
                                     <td> <button class="btn btn-danger" type="submit" value="{{project.pid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ project.projectname }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>
@@ -107,4 +130,6 @@
         </div>
     </div>
 </div>
+
+
 {% endblock %}

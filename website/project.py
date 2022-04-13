@@ -23,6 +23,11 @@ def getProject(data):
 			'eid':data[0],
 			'pid':data[1],
             'projectname': data[2],
+			'enterpriseNo': data[3],
+			'capital': data[4],
+			'principal': data[5],
+			'address': data[6],
+			'inid': data[7],
 			'enterpriseName': data[8]
         }
 		project_list.append(project)

@@ -85,8 +85,10 @@
 					  	<col width="5%"/>
 						<col width="50%"/>
 						<col width="35%"/>
+                        {% if (user.role == 1 )%}    
                         <col width="5%"/>
 						<col width="0%"/>
+                        {% endif %}
 						<tbody>
 							{% for project in projectData %}
 								<tr>
@@ -95,7 +97,7 @@
 								<td>{{ project.enterpriseName}}</td>
                                 {% if (user.role == 1 )%}  
                                     <td><button class="btn btn-info" type="submit" name="edit" value="{{ project.pid }}"><i class='fa fa-edit'></i></button></td>
-                                    <td> <button class="btn btn-danger" type="submit" value="{{project.pid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ project.projectname }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
+                                    <td> <button class="btn btn-danger" type="submit" value="{{project.pid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ project.projectname }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>
                                     </tr>
                                 {% endif %}
 							{% endfor %}

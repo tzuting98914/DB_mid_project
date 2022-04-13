@@ -96,13 +96,10 @@
 
 
 <script type="text/javascript">
-    function disp_confirm()
-    {
-    var r=confirm("Press a button")
-    if (r==false){
-        return true
-      }
-    }
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
 </script>
 
 <!-- DataTales Example -->
@@ -136,9 +133,11 @@
 						<col width="9%"/>                  
 						<col width="7%"/>                  
 						<col width="25%"/>                  
-						<col width="16%"/>                  
+						<col width="16%"/>  
+                        {% if (user.role == 1 )%}                  
 						<col width="5%"/>
                         <col width="5%"/>
+                        {% endif %}
 						<tbody>
 							{% for enterprise in enterpriseData %}
 							<tr>

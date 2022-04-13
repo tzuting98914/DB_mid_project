@@ -1,4 +1,3 @@
-from turtle import update
 from flask import Blueprint, render_template, request, flash, redirect,url_for
 from flask_login import current_user,login_required
 from website import connectDB
@@ -28,24 +27,6 @@ def getEnterprise():
 	cursor.execute(sql)
 	allEnterprise = cursor.fetchall()
 	return allEnterprise
-
-def getProject():
-	sql = 'SELECT * FROM POJECT NATURAL JOIN ENTERPRISE WHERE ROWNUM <= 10'
-	cursor.execute(sql)
-	allproject = cursor.fetchall()
-	
-	project_list = []
-	count = 0
-	for data in allproject:
-		count = count+1
-		project = {
-			'序號':count,
-            '工程名稱': data[2],
-			'業主名稱': data[8]
-        }
-		project_list.append(project)
-	return project_list
-
 	
 
 def enterprise_to_list(TotalData):
@@ -54,14 +35,14 @@ def enterprise_to_list(TotalData):
 	for data in TotalData:
 		count = count+1
 		enterprise = {
-			'序號':count,
-			'事業單位編號': data[1],
-            '統一編號': data[2],
-            '公司名稱': data[6],
-			'資本額': data[3],
-			'代表人': data[4],
-			'地址': data[5],
-			'行業別': data[8]
+			'count':count,
+			'eid': data[1],
+            'enterpriseNo': data[2],
+            'enterpriseName': data[6],
+			'capital': data[3],
+			'principal': data[4],
+			'address': data[5],
+			'industryType': data[8]
         }
 		Enterprise_list.append(enterprise)
 	return Enterprise_list
@@ -134,17 +115,16 @@ def search():
 	return render_template("enterprise.html",enterpriseData = Enterprise_list,industryData = industryData,user=current_user)
 	# return render_template("enterprise.html",user=current_user)
 
-@enterprise.route('/enterprise/update_or_new', methods=['GET','POST'])
-def update_or_new():
+@enterprise.route('/enterprise/update', methods=['GET','POST'])
+def update():
 	industryData = getIndustry()
-	actionType = request.values.get('actionType')
 	# 新增資料
-	if actionType =='add':
+	if (request.values.get('add')):
 		# 系統生成新的eid
 		cursor.execute('SELECT EID FROM ENTERPRISE WHERE ROWNUM =1 ORDER BY EID DESC')
 		lastEnterprise = cursor.fetchone()
 		lastEid = lastEnterprise[0]
-		newEid = str(int(re.search('\d+',lastEid).group(0)) + 1).zfill(10)		
+		newEid = "E"+str(int(re.search('\d+',lastEid).group(0)) + 1).zfill(9)		
 		# print(lastEid)
 		if request.method == 'POST':
 			# request得到的data
@@ -164,7 +144,7 @@ def update_or_new():
 			return redirect(url_for('enterprise.showEnterprise'))
 		return render_template("enterprise_new.html",newEid = newEid,industryData = industryData, user = current_user)
 	# 修改完畢
-	elif(actionType =='update_finish'):
+	elif(request.values.get('update_finish')):
 		eid = request.values.get('up_Eid')
 		# request得到的data
 		up_eNo = request.values.get('eNo')
@@ -196,15 +176,16 @@ def update_or_new():
 		connection.commit()
 
 		return redirect(url_for('enterprise.showEnterprise'))
-	# 回傳的是編號就是修改某個編號的資料
+	# 編輯資料
 	elif(request.values.get('edit')):
 		eid = request.values.get('edit')
 		print(eid)
-		cursor.prepare("SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE EID=(:eid)")
+		cursor.prepare("SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE EID =:eid")
 		cursor.execute(None, {'eid':eid})
 		connection.commit()
 		update_enterprise = cursor.fetchone()
 		Enterprise_list = list(update_enterprise)
+		return render_template("enterprise_new.html",Enterprisedata = Enterprise_list,industryData = industryData, user = current_user)
 	else:
 		return redirect(url_for('enterprise.showEnterprise'))
-	return render_template("enterprise_new.html",Enterprisedata = Enterprise_list,industryData = industryData, user = current_user)
+	

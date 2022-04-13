@@ -11,7 +11,7 @@
         <h6 class="m-0 font-weight-bold text-primary">詳細資訊</h6>
     </div>
     <div class="card-body">
-        <form method="post" action={{ url_for('enterprise.update_or_new') }}>
+        <form method="post" action={{ url_for('enterprise.update') }}>
             <div class="form-row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -93,9 +93,9 @@
                 {% endif %}
             </div>
             {% if Enterprisedata %}
-                <button class="btn btn-info" type="submit" name="actionType" value="update_finish">修改完成</button>  
+                <button class="btn btn-info" type="submit" name="update_finish" value="update_finish">修改完成</button>  
             {% else %}
-                <button class="btn btn-info" type="submit" name="actionType" value="add">新增資料</button>  
+                <button class="btn btn-info" type="submit" name="add" value="add">新增資料</button>  
             {% endif %}
             <a href="{{ url_for('enterprise.showEnterprise') }}">
                 <button class="btn btn-info" type="button">回上一頁</button>

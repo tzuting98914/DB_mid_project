@@ -9,14 +9,18 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-<a href="{{ url_for('project.new') }}">
-    <button class="btn btn-info" type="button">新增工程資料</button>
-</a><br><br>
-
+{% if (user.role == 1 )%}
+<form method="get" action={{ url_for('project.update') }}>
+    <button class="btn btn-info" type="submit" name="add" value="add">
+        新增工程資料
+    </button>
+    </form>
+<br><br>
+{% endif %}
 
 <div class="card mb-4 py-3 border-left-primary">
     <div class="card-body">
-        <form method="post">
+        <form method="post" action={{ url_for('project.search') }}>
             <div class="form-group">
                 <label class="small mb-1">
                     <text>工程編號</text>
@@ -37,10 +41,10 @@
                         <label class="small mb-1">
                             <text>業主名稱</text>
                         </label><br>
-                        <select class="form-control" name="inId_search"> 
+                        <select class="form-control" name="eId_search"> 
                             <option value="" disabled selected>請選擇業主...</option>
-                            {% for info in injurytype_data %}
-                                <option value="{{ info.injuryname }}">{{ info.injuryname }}</option>
+                            {% for enterprise in enterpriseData %}
+                                <option value="{{ enterprise.eid }}">{{ enterprise.enterpriseName }}</option>
                             {% endfor %}
                         </select>              
                     </div>
@@ -65,25 +69,35 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='post'>
+            <form method="post" action={{ url_for('project.update') }}>
                 <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
 					<thead>
 						<tr>
 						  <th scope="col">序號</th>
 						  <th scope="col">工程名稱</th>
 						  <th scope="col">業主名稱</th>
+                          {% if (user.role == 1 )%}  
+						  <th scope="col">修改</th>
+                          <th scope="col">刪除</th>
+                          {% endif %}
 						</tr>
 					  </thead>
 					  	<col width="5%"/>
-						<col width="55%"/>
-						<col width="40%"/>
+						<col width="50%"/>
+						<col width="35%"/>
+                        <col width="5%"/>
+						<col width="0%"/>
 						<tbody>
 							{% for project in projectData %}
 								<tr>
-								<td>{{ project.序號 }}</td>
-								<td> {{ project.工程名稱 }}</td>
-								<td>{{ project.業主名稱}}</td>
-								</tr>
+								<td>{{ project.count }}</td>
+								<td> {{ project.projectname }}</td>
+								<td>{{ project.enterpriseName}}</td>
+                                {% if (user.role == 1 )%}  
+                                    <td><button class="btn btn-info" type="submit" name="edit" value="{{ project.pid }}"><i class='fa fa-edit'></i></button></td>
+                                    <td> <button class="btn btn-danger" type="submit" value="{{project.pid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ project.projectname }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
+                                    </tr>
+                                {% endif %}
 							{% endfor %}
 						</tbody>
 				</table>

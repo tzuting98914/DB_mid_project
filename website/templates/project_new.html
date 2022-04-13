@@ -11,170 +11,55 @@
         <h6 class="m-0 font-weight-bold text-primary">詳細資訊</h6>
     </div>
     <div class="card-body">
-        <form method="post">
+        <form method="post" action={{ url_for('project.update') }}>
             <div class="form-row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="small mb-1">工程編號</label><br>                        
-                        {% if data %}
-                            <label>{{ data.wid }}</label>  
+                        <label class="small mb-1">工程編號</label><br>
+                        {% if ProjectData %}
+                            <label>{{ ProjectData[1] }}</label>  
+                            <input value={{ ProjectData[1] }} name = "up_Pid" type = hidden></input>  
                         {% else %}
-                            <label>* 未生成</label>  
+                            <label>{{ newPid }}</label>
+                            <input value={{newPid}} name = "newPid" type = hidden></input>    
                         {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="small mb-1">發生時間</label><br>                        
-                        {% if data %}
-                            <input class="form-control" type="date" name="wdate" value="{{ data.wdate }}" required>
-                        {% else %}
-                            <input class="form-control" type="date" name="wdate" required>  
-                        {% endif %}                      
                     </div>
                 </div>
             </div>
             <hr>
-
-            <div class="form-group">
-                <label class="small mb-1">
-                    <text>工程名稱</text>
-                </label><br>  
-                                                                  
-                <select class="form-control" name="pid" required>
-                    <option value="" disabled selected>請選擇工程名稱...</option>
-                    {% for info in project_data %}
-                        {% if (data) and (info.pid == data.pid) %}
-                            <option value="{{ info.pid }}" selected>{{ info.projectname }}</option>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">工程名稱</label>
+                        {% if ProjectData %}
+                            <input class="form-control" name="pName" value="{{ ProjectData[2] }}" >
                         {% else %}
-                            <option value="{{ info.pid }}">{{ info.projectname }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>                 
-                
-                <!-- todo: 還沒辦法隱藏VAlue 
-                <input type="text" name="pid" list="pidName" class="form-control">
-                <datalist id="pidName">
-                    <option value="" disabled selected>請選擇工程名稱...</option>
-                    {% for info in project_data %}
-                        <option value="{{ info.pid }}">{{ info.projectname }}</option>
-                    {% endfor %}
-                </datalist>
-                -->
-            </div>
-
-            <div class="form-row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="small mb-1">
-                            * <text>職災類型</text>
-                        </label><br>
-                        <select class="form-control" name="iid" required> 
-                            <option value="" disabled selected>請選擇職災類型...</option>
-                            {% for info in injurytype_data %}
-                                {% if (data) and (info.iid == data.iid) %}
-                                    <option value="{{ info.iid }}" selected>{{ info.injuryname }}</option>
-                                {% else %}
-                                    <option value="{{ info.iid }}">{{ info.injuryname }}</option>
-                                {% endif %}
-                            {% endfor %}
-
-                        </select> 
+                            <input class="form-control "name="pName" >  
+                        {% endif %} 
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="small mb-1">
-                            <text>罹災人數</text>
-                        </label><br>
-                            {% if data %}
-                                <input class="form-control" name="num" type="number" min="1" value="{{ data.num }}" required>
-                            {% else %}
-                                <input class="form-control" name="num" type="number" min="1" required>  
-                            {% endif %}
+                        <label class="small mb-1">* 業主名稱</label>
+                        <select class="form-control" name="eid" required> 
+                            <option value="" disabled selected>請選擇業主...</option>
+                            {% for data in EnterpriseData %}
+                                {% if (ProjectData) and (ProjectData[0] == data.eid) %}
+                                    <option value="{{ ProjectData[0] }}" selected>{{ ProjectData[8] }}</option>
+                                {% else %}
+                                    <option value="{{ data.eid }}">{{ data.enterpriseName }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="small mb-1">
-                            * <text>事業單位</text>
-                        </label><br>
-                        <select class="form-control" name="eid" required>
-                            <option value="" disabled selected>請選擇事業單位...</option>
-                            {% for info in enterprise_data %}
-                                {% if (data) and (info.eid == data.eid) %}
-                                    <option value="{{ info.eid }}" selected>{{ info.enterprisename }}</option>
-                                {% else %}
-                                    <option value="{{ info.eid }}">{{ info.enterprisename }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select> 
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="small mb-1">
-                            <text>* 勞動檢查機構</text>
-                        </label><br>
-                         <select class="form-control" name="agencyname" required>
-                            <option value="" disabled selected>請選擇勞動檢查機構...</option>
-                            {% for info in agency_data %}
-                                {% if (data) and (info.agencyname == data.agencyname) %}
-                                    <option value="{{ info.agencyname }}" selected>{{ info.agencyname }}</option>
-                                {% else %}
-                                    <option value="{{ info.agencyname }}">{{ info.agencyname }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select> 
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="small mb-1">
-                    <text>肇事位置</text>
-                </label>
-                    {% if data %}
-                        <textarea class="form-control" rows="2" name="location">{{ data.location }}</textarea>
-                    {% else %}
-                        <textarea class="form-control" rows="2" name="location"></textarea>
-                    {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label class="small mb-1">
-                    <text>肇事地址</text>
-                </label>                                                    
-                    {% if data %}
-                        <textarea class="form-control" rows="2" name="address">{{ data.address }}</textarea> 
-                    {% else %}
-                        <textarea class="form-control" rows="2" name="address"></textarea>
-                    {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label class="small mb-1">
-                    <text>備註</text>
-                </label>
-                    {% if data %}
-                        <textarea class="form-control" rows="2" name="note">{{ data.note }}</textarea>
-                    {% else %}
-                        <textarea class="form-control" rows="2" name="note"></textarea>
-                    {% endif %}
-            </div>     
-            
-            
-            <button class="btn btn-info" type="submit" name="submitBtn" value="add">
-                新增資料
-            </button> 
-
-            <button class="btn btn-info" type="submit" name="submitBtn" value="edit">
-                編輯資料
-            </button> 
-
+            {% if ProjectData %}
+                <button class="btn btn-info" type="submit" name="update_finish" value="update_finish">修改完成</button>  
+            {% else %}
+                <button class="btn btn-info" type="submit" name="add" value="add">新增資料</button>  
+            {% endif %}
             <a href="{{ url_for('project.showproject') }}">
                 <button class="btn btn-info" type="button">回上一頁</button>
             </a>

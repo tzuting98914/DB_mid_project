@@ -9,12 +9,15 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-<form method="get" action={{ url_for('enterprise.update_or_new') }}>
-<button class="btn btn-info" type="submit" name="actionType" value="add">
-    新增事業單位資料
-</button>
-</form>
-<br><br>
+{% if (user.role == 1 )%}
+    <form method="get" action={{ url_for('enterprise.update') }}>
+        <button class="btn btn-info" type="submit" name="add" value="add">
+            新增事業單位資料
+        </button>
+        </form>
+    <br><br>
+{% endif %}
+
 
 <div class="card mb-4 py-3 border-left-primary">
     <div class="card-body">
@@ -110,7 +113,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='get' action = {{ url_for('enterprise.update_or_new') }}>
+            <form  method='get' action = {{ url_for('enterprise.update') }}>
                 <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
 					<thead>
 						<tr>
@@ -121,8 +124,10 @@
 						  <th scope="col">代表人</th>
 						  <th scope="col">地址</th>
 						  <th scope="col">行業別</th>
+                          {% if (user.role == 1 )%}  
 						  <th scope="col">修改</th>
                           <th scope="col">刪除</th>
+                          {% endif %}
 						</tr>
 					  </thead>
 					  <col width="5%"/>
@@ -137,17 +142,18 @@
 						<tbody>
 							{% for enterprise in enterpriseData %}
 							<tr>
-							  <td>{{ enterprise.序號 }}</td>
-							  <td> {{ enterprise.統一編號 }}</td>
-							  <td> {{ enterprise.公司名稱 }}</td>
-							  <td> {{ enterprise.資本額 }}</td>
-							  <td> {{ enterprise.代表人 }}</td>
-							  <td> {{ enterprise.地址 }}</td>
-							  <td> {{ enterprise.行業別 }}</td>
-                                
-                              <td><button class="btn btn-info" type="submit" name="edit" value={{ enterprise.事業單位編號 }}><i class='fa fa-edit'></i></button></td>
-							  <td> <button class="btn btn-danger" type="submit" value="{{enterprise.事業單位編號}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.公司名稱 }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
-							</tr>
+							  <td>{{ enterprise.count }}</td>
+							  <td> {{ enterprise.enterpriseNo }}</td>
+							  <td> {{ enterprise.enterpriseName }}</td>
+							  <td> {{ enterprise.capital }}</td>
+							  <td> {{ enterprise.principal }}</td>
+							  <td> {{ enterprise.address }}</td>
+							  <td> {{ enterprise.industryType }}</td>
+                              {% if (user.role == 1 )%}  
+                                <td><button class="btn btn-info" type="submit" name="edit" value={{ enterprise.eid }}><i class='fa fa-edit'></i></button></td>
+                                <td> <button class="btn btn-danger" type="submit" value={{enterprise.eid}} name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.公司名稱 }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
+                                </tr>
+                             {% endif %}
 							{% endfor %}
 						</tbody>
 				</table>

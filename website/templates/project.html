@@ -68,7 +68,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='post'>
+            <form  method='get' action = {{ url_for('project.update') }}>
                 <table class="table table-bordered" id="projectTable" width="100%" cellspacing="0">
 					<thead>
 						<tr>
@@ -81,20 +81,20 @@
                           {% endif %}
 						</tr>
 					  </thead>
-					  	<col width="5%"/>
-						<col width="50%"/>
-						<col width="35%"/>
+					  	<col width="7%"/>
+						<col width="40%"/>
+						<col width="39%"/>
                         {% if (user.role == 1 )%}    
-                        <col width="5%"/>
-						<col width="0%"/>
+                        <col width="7%"/>
+						<col width="7%"/>
                         {% endif %}
 						<tbody>
 							{% for project in projectData %}
 								<tr>
 								<td>{{ project.count }}</td>
 								<td> {{ project.projectname }}</td>
-								<td><!-- Button trigger modal -->
-                                    <a data-bs-toggle="modal" data-bs-target="#showModal{{ project.count }}">
+									<td><!-- Button trigger modal -->
+                                    <a  data-toggle="modal" data-target="#showModal{{ project.count }}">
                                         {{ project.projectname }}
                                     </a>
                                     <!-- Modal -->
@@ -113,7 +113,7 @@
                                               <p>地址：{{ project.address }}</p>
                                           </div>
                                           <div class="modal-footer" >
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                           </div>
                                         </div>
                                       </div>

@@ -95,12 +95,6 @@
 </div>
 
 
-<script type="text/javascript">
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-})
-</script>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
@@ -110,7 +104,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='post'>
+            <form  method='get' action = {{ url_for('enterprise.update') }}>
                 <table class="table table-bordered" id="enterpriseTable" width="100%" cellspacing="0">
 					<thead>
 						<tr>
@@ -150,7 +144,7 @@
 							  <td> {{ enterprise.industryType }}</td>
                               {% if (user.role == 1 )%}  
                                 <td><button class="btn btn-info" type="submit" name="edit" value={{ enterprise.eid }}><i class='fa fa-edit'></i></button></td>
-                                <td> <button class="btn btn-danger" type="submit" value={{enterprise.eid}} name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.公司名稱 }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
+                                <td> <button class="btn btn-danger" type="submit" value={{enterprise.eid}} name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.enterpriseName }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
                                 </tr>
                              {% endif %}
 							{% endfor %}

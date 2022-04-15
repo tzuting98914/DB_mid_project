@@ -42,7 +42,7 @@ def showproject():
 	projectData = getProject(allProject)
 	enterpriseData = enterprise_to_list(getEnterprise())
 	
-	return render_template("project.html",projectData = projectData[0:10],enterpriseData = enterpriseData, user = current_user)
+	return render_template("project.html",projectData = projectData,enterpriseData = enterpriseData, user = current_user)
 
 @project.route('/project/search', methods=['GET','POST'])
 def search():

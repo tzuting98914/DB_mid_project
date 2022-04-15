@@ -62,7 +62,7 @@ def showEnterprise():
 	# print(industryData)
 
 	# print(len(enterpriseData))
-	return render_template("enterprise.html",enterpriseData = enterpriseData[0:10],industryData = industryData, user=current_user)
+	return render_template("enterprise.html",enterpriseData = enterpriseData,industryData = industryData, user=current_user)
 
 
 @enterprise.route('/enterprise/search', methods=['GET','POST'])

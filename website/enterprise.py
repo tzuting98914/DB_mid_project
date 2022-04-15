@@ -7,21 +7,12 @@ cursor = connection.cursor()
 
 enterprise = Blueprint('enterprise', __name__)
 
-def getIndustry():
-	sql = 'SELECT DISTINCT * FROM INDUSTRY ORDER BY CATEGORY'
-	cursor.execute(sql)
-	industryData = cursor.fetchall()
-	industry_list = []
-	for data in industryData:
-		industry = {
-			'iid':data[0],
-			'industryName':data[2]
-		}
-		industry_list.append(industry)
-	return industry_list
 
-def getEnterprise():
-	sql = 'SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE ENTERPRISENO IS NOT NULL'
+@enterprise.route('/enterprise')
+@login_required
+def showEnterprise():
+	
+	sql = 'SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE ENTERPRISENO IS NOT NULL AND ROWNUM <= 10'
 	
 	cursor.execute(sql)
 	allEnterprise = cursor.fetchall()
@@ -41,30 +32,8 @@ def getEnterprise():
 			'行業別': data[8]
         }
 		Enterprise_list.append(enterprise)
-	return Enterprise_list
-
-
-@enterprise.route('/enterprise')
-def showEnterprise():
-	enterpriseData = getEnterprise()
-	industryData = getIndustry()
-	# print(industryData)
-
-	print(len(enterpriseData))
-	return render_template("enterprise.html",enterpriseData = enterpriseData[0:10],industryData = industryData, user=current_user)
-
-
-@enterprise.route('/enterprise/search', methods=['GET','POST'])
-def search():
-	eId_search = request.form.get('eId_search')
-	eNo_search = request.form.get('eNo_search')
-	eName_search = request.form.get('eName_search')
-	eCap_search = request.form.get('eCap_search')
-	ePr_search = request.form.get('ePr_search')
-	eAdd_search = request.form.get('eAdd_search')
-
-
-
+	# print(len(allEnterprise))
+	return render_template("enterprise.html",enterpriseData = Enterprise_list, user=current_user)
 
 @enterprise.route('/enterprise/update', methods=['GET','POST'])
 def update():
@@ -81,11 +50,10 @@ def delect():
 	return render_template("home.html", user=current_user)
 
 @enterprise.route('/enterprise/new', methods=['GET','POST'])
-@login_required
 def new():
 	# request得到的data
 	pid = request.values.get('pid')
 	# print(eid)
 	# sql = 'UPDATE ENTERPRISE SET '
 	# cursor.execute(sql)
-	return render_template("enterprise_new.html", user = current_user)
+	return render_template("enterprise_new.html")

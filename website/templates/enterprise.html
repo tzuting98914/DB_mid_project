@@ -70,8 +70,8 @@
                         </label><br>
                         <select class="form-control" name="inId_search"> 
                             <option value="" disabled selected>請選擇行業別...</option>
-                            {% for data in industryData %}
-                                <option value="{{ data.industryName }}">{{ data.industryName }}</option>
+                            {% for info in injurytype_data %}
+                                <option value="{{ info.injuryname }}">{{ info.injuryname }}</option>
                             {% endfor %}
                         </select>
                     </div>

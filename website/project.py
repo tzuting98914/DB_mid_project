@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, flash
 from website import connectDB
-from flask_login import current_user,login_required
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -25,7 +24,7 @@ def showproject():
         }
 		project_list.append(project)
 	# print(len(allEnterprise))
-	return render_template("project.html",projectData = project_list, user = current_user)
+	return render_template("project.html",projectData = project_list)
 
 @project.route('/project/new', methods=['GET','POST'])
 def new():
@@ -34,4 +33,4 @@ def new():
 	# print(eid)
 	# sql = 'UPDATE ENTERPRISE SET '
 	# cursor.execute(sql)
-	return render_template("project_new.html", user = current_user)
+	return render_template("project_new.html")

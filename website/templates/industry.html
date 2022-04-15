@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}行業別管理{% endblock %} 
+{% block head %}行業別管理{% endblock %}
+{% block content %}
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+{% if user.mid %}
+<a href="{{ url_for('industry.viewIndustry') }}">
+    <button class="btn btn-info" type="button">新增行業別資料</button>
+</a><br><br>
+{% endif %}
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>行業編號</text>
+                </label>
+                <input class="form-control" type="label-text" name="inid_search">
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>行業類別</text>
+                        </label><br>
+                        <!-- <input class="form-control" type="label-text" name="estr_search"> -->
+                        <select class="form-control" name="category_search"> 
+                            <option value="" disabled selected>請選擇行業類別...</option>
+                            {% for i in data_category %}
+                                <option value="{{ i.CATEGORY }}">{{ i.CATEGORY }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>行業名稱</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="inName_search">                
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋行業別
+        </button> 
+    </form>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">行業別列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="IndustryTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>行業編號</th>
+                            <th>行業類別</th>
+                            <th>行業名稱</th>
+                            <th>行業敘述</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>行業編號</th>
+                            <th>行業類別</th>
+                            <th>行業名稱</th>
+                            <th>行業敘述</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+                        </tr>
+                    </tfoot>  
+                    <col width="10%"/>
+                    <col width="5%"/>
+                    <col width="15%"/>
+                    <col width="20%"/>
+                    {% if user.mid %}
+                        <col width="5%"/>                  
+                        <col width="5%"/> 
+                    {% endif %}                              
+                    <tbody>                                               
+                        {% for i in industry_data %}
+                            <tr>
+                                <td> {{ i.inId }}</td>
+                                <td> {{ i.category }}</td>
+                                <td> {{ i.industryName }}</td>
+                                <td> {{ i.industryDesc }}</td>
+                                {% if user.mid %}
+                                    <td>
+                                        <button class="btn btn-info" type="submit" value="{{i.inId}}" name="edit">
+                                            <i class='fa fa-edit'></i>
+                                        </button>                                
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger" type="submit" value="{{i.inId}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ i.inId }}\' 行業別嗎？'))">                               
+                                            <i class='fa fa-trash-alt'></i>
+                                        </button>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <script language="javascript">
+        $(document).ready( function () {
+            $('#IndustryTable').DataTable();
+        } );
+    </script>
+
+{% endblock %}

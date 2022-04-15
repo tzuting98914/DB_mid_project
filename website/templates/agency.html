@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}勞檢單位管理{% endblock %} 
+{% block head %}勞檢單位管理{% endblock %}
+{% block content %}
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+{% if user.mid %}
+<a href="{{ url_for('agency.viewAgency') }}">
+    <button class="btn btn-info" type="button">新增勞檢單位資料</button>
+</a><br><br>
+{% endif %}
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>勞動檢查機構名稱</text>
+                </label><br>
+                <!-- <input class="form-control" type="label-text" name="estr_search"> -->
+                <select class="form-control" name="agencyName_search"> 
+                    <option value="" disabled selected>請選擇勞動檢查機構...</option>
+                    {% for i in data_agencyName %}
+                        <option value="{{ i.agencyName }}">{{ i.agencyName }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>電話</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="phone_search">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>地址</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="address_search">                
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>檢查責任區域</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="area_search">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋勞動檢查機構
+        </button> 
+    </form>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">勞動檢查機構列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="workInjuryTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>勞動檢查機構名稱</th>
+                            <th>電話</th>
+                            <th>地址</th>
+                            <th>檢查責任區域</th>
+                            <th>網址</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>勞動檢查機構名稱</th>
+                            <th>電話</th>
+                            <th>地址</th>
+                            <th>檢查責任區域</th>
+                            <th>網址</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+                        </tr>
+                    </tfoot>  
+                    <col width="20%"/>
+                    <col width="12%"/>
+                    <col width="15%"/>
+                    <col width="15%"/>
+                    <col width="10%"/>
+                    {% if user.mid %}
+                        <col width="5%"/>                  
+                        <col width="5%"/> 
+                    {% endif %}                                
+                    <tbody>                                               
+                        {% for i in agency_data %}
+                            <tr>
+                                <td> {{ i.agencyName }}</td>
+                                <td> {{ i.phone }}</td>
+                                <td> {{ i.address }}</td>
+                                <td> {{ i.area }}</td>
+                                <td><a href="{{ i.url }}">{{ i.url }}</a></td>
+                                {% if user.mid %}
+                                    <td>
+                                        <button class="btn btn-info" type="submit" value="{{i.agencyName}}" name="edit">
+                                            <i class='fa fa-edit'></i>
+                                        </button>                                
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger" type="submit" value="{{i.agencyName}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ i.agencyName }}\' 的勞檢單位資料嗎？'))">                               
+                                            <i class='fa fa-trash-alt'></i>
+                                        </button>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <script language="javascript">
+        $(document).ready( function () {
+            $('#AgencyTable').DataTable();
+        } );
+    </script>
+
+{% endblock %}

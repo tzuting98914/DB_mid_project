@@ -8,7 +8,6 @@ auth = Blueprint('auth', __name__)
 connection = connectDB()
 cursor = connection.cursor()
 
-
 @auth.route('/login', methods=['GET','POST'])
 def login():
 	# request得到的data

@@ -10,3 +10,16 @@ $(document).ready(function() {
 $(document).ready(function() {
   $('#projectTable').DataTable();
 });
+
+
+$(document).ready(function() {
+  $('#agencyTable').DataTable();
+});
+
+$(document).ready( function () {
+    $('#injurytypeTable').DataTable();
+} );
+
+$(document).ready( function () {
+  $('#industryTable').DataTable();
+} );

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}災害類別管理{% endblock %} 
+{% block head %}災害類別管理{% endblock %}
+{% block content %}
+
+<link 
+    href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}}
+    rel="stylesheet">
+
+<p class="mb-4">資料來源：勞動部職業災和記載列表</p>
+{% if user.mid %}
+<a href="{{ url_for('injury.viewInjury') }}">
+    <button class="btn btn-info" type="button">新增災害類別資料</button>
+</a><br><br>
+{% endif %}
+
+
+<div class="card mb-4 py-3 border-left-primary">
+    <div class="card-body">
+        <form method="post">
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>災害編號</text>
+                </label>
+                <input class="form-control" type="label-text" name="iId_search">
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>災害類別</text>
+                        </label><br>
+                        <!-- <input class="form-control" type="label-text" name="estr_search"> -->
+                        <select class="form-control" name="injuryName_search"> 
+                            <option value="" disabled selected>請選擇災害名稱...</option>
+                            {% for i in data_injuryName %}
+                                <option value="{{ i.injuryName }}">{{ i.injuryName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">
+                            <text>災害敘述</text>
+                        </label><br>
+                        <input class="form-control" type="label-text" name="injuryDesc_search">                
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button 
+            style = "margin:0% 2% 0% 2%;"
+            class="btn btn-info" 
+            type="submit" 
+            name="search" >
+            搜尋災害類別
+        </button> 
+    </form>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">災害類別列表</h6>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <form  method='post'>
+                <table class="table table-bordered" id="injurytypeTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>災害編號</th>
+                            <th>災害名稱</th>
+                            <th>災害敘述</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>災害編號</th>
+                            <th>災害名稱</th>
+                            <th>災害敘述</th>
+                            {% if user.mid %}
+                                <th>編輯</th>
+                                <th>刪除</th>
+                            {% endif %}
+                        </tr>
+                    </tfoot>  
+                    <col width="10%"/>
+                    <col width="15%"/>
+                    <col width="20%"/>
+                    {% if user.mid %}
+                        <col width="5%"/>                  
+                        <col width="5%"/> 
+                    {% endif %}                                
+                    <tbody>                                               
+                        {% for i in injury_data %}
+                            <tr>
+                                <td> {{ i.iId }}</td>
+                                <td> {{ i.injuryName }}</td>
+                                <td> {{ i.injuryDesc }}</td>
+                                {% if user.mid %}
+                                    <td>
+                                        <button class="btn btn-info" type="submit" value="{{i.iId}}" name="edit">
+                                            <i class='fa fa-edit'></i>
+                                        </button>                                
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger" type="submit" value="{{i.iId}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ i.iId }}\' 災害類型嗎？'))">                               
+                                            <i class='fa fa-trash-alt'></i>
+                                        </button>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

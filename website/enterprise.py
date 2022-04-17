@@ -140,7 +140,7 @@ def update():
 			cursor.prepare("INSERT INTO ENTERPRISE VALUES (:new_eid, :new_eNo, :new_eCap, :new_ePri, :new_eAdd, :new_inId, :new_eName)")
 			cursor.execute(None, {'new_eid':new_eid, 'new_eNo':new_eNo, 'new_eCap':new_eCap, 'new_ePri':new_ePri, 'new_eAdd':new_eAdd, 'new_inId':new_inId, 'new_eName':new_eName})
 			connection.commit()
-			
+			flash('新增事業單位資料成功', category='success')
 			return redirect(url_for('enterprise.showEnterprise'))
 		return render_template("enterprise_new.html",newEid = newEid,industryData = industryData, user = current_user)
 	# 修改完畢
@@ -166,6 +166,7 @@ def update():
 						""")
 		cursor.execute(None, {'eid':eid,'up_eNo':up_eNo,'up_inId':up_inId,'up_eName':up_eName,'up_eCap':up_eCap,'up_ePri':up_ePri,'up_eAdd':up_eAdd})
 		connection.commit()
+		flash('修改事業單位資料成功', category='success')
 		return redirect(url_for('enterprise.showEnterprise'))
 	# 刪除資料
 	elif(request.values.get('delete')):
@@ -174,7 +175,7 @@ def update():
 		cursor.execute(None, {'eid':eid})
 		# print('delete'+eid)
 		connection.commit()
-
+		flash('刪除事業單位資料成功', category='success')
 		return redirect(url_for('enterprise.showEnterprise'))
 	# 編輯資料
 	elif(request.values.get('edit')):

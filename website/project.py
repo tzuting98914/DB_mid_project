@@ -90,6 +90,7 @@ def update():
 			cursor.execute(None, {'new_pid':new_pid, 'new_pName':new_pName, 'new_eid':new_eid})
 			connection.commit()
 			
+			flash('新增工程資料成功', category='success')
 			return redirect(url_for('project.showproject'))
 		return render_template("project_new.html",newPid = newPid,EnterpriseData = EnterpriseData, user = current_user)
 	# 修改完畢
@@ -107,6 +108,8 @@ def update():
 						""")
 		cursor.execute(None, {'up_pName':up_pName,'up_eid':up_eid,'pid':pid})
 		connection.commit()
+
+		flash('修改工程資料成功', category='success')
 		return redirect(url_for('project.showproject'))
 	# 刪除資料
 	elif(request.values.get('delete')):
@@ -115,6 +118,7 @@ def update():
 		cursor.execute(None, {'pid':pid})
 		connection.commit()
 
+		flash('刪除工程資料成功', category='success')
 		return redirect(url_for('project.showproject'))
 	# 編輯資料
 	elif(request.values.get('edit')):

@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}工程新增{% endblock %} 
-{% block head %}工程新增{% endblock %}
+{% block title %}
+    {% if ProjectData %}工程編輯{% else %}工程新增{% endif %}
+{% endblock %} 
+
+{% block head %}
+    {% if ProjectData %}工程編輯{% else %}工程新增{% endif %} 
+{% endblock %}
+
 
 
 {% block content %}

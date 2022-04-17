@@ -8,7 +8,7 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-{% if (user.role == 1 )%}
+{% if user.role is defined %}
 <form method="get" action={{ url_for('project.update') }}>
     <button class="btn btn-info" type="submit" name="add" value="add">
         新增工程資料
@@ -40,7 +40,8 @@
                         <label class="small mb-1">
                             <text>業主名稱</text>
                         </label><br>
-                        <select class="form-control" name="eId_search"> 
+                        <!--<select class="form-control" name="eId_search"> -->
+                            <select class="form-control" data-live-search="true">
                             <option value="" disabled selected>請選擇業主...</option>
                             {% for enterprise in enterpriseData %}
                                 <option value="{{ enterprise.eid }}">{{ enterprise.enterpriseName }}</option>
@@ -60,6 +61,15 @@
         </button> 
     </form>
 </div>
+
+<p class="mb-4">
+    {% if projectData|length < 1  %}
+        無符合條件的資料，請更換搜尋條件    
+    {% else %}
+        共 {{ projectData|length }} 筆資料
+    {% endif %}
+</p>
+
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
@@ -70,12 +80,13 @@
         <div class="table-responsive">
             <form  method='get' action = {{ url_for('project.update') }}>
                 <table class="table table-bordered" id="projectTable" width="100%" cellspacing="0">
+                    <a class="btn btn-primary" href="{{ url_for('project.showproject')}}" style="left">清除搜尋條件</a>
 					<thead>
 						<tr>
 						  <th scope="col">序號</th>
 						  <th scope="col">工程名稱</th>
 						  <th scope="col">業主名稱</th>
-                          {% if (user.role == 1 )%}  
+                          {% if user.role is defined %}  
 						  <th scope="col">修改</th>
                           <th scope="col">刪除</th>
                           {% endif %}
@@ -84,7 +95,7 @@
 					  	<col width="7%"/>
 						<col width="40%"/>
 						<col width="39%"/>
-                        {% if (user.role == 1 )%}    
+                        {% if user.role is defined %}   
                         <col width="7%"/>
 						<col width="7%"/>
                         {% endif %}
@@ -95,7 +106,7 @@
 								<td> {{ project.projectname }}</td>
 									<td><!-- Button trigger modal -->
                                     <a  data-toggle="modal" data-target="#showModal{{ project.count }}">
-                                        {{ project.projectname }}
+                                        {{ project.enterpriseName }}
                                     </a>
                                     <!-- Modal -->
                                     <div class="modal fade" id="showModal{{ project.count }}" tabindex="-1" aria-labelledby="showModalLabel" aria-hidden="true">
@@ -118,7 +129,7 @@
                                         </div>
                                       </div>
                                     </div></td>
-                                {% if (user.role == 1 )%}  
+                                    {% if user.role is defined %}  
                                     <td><button class="btn btn-info" type="submit" name="edit" value="{{ project.pid }}"><i class='fa fa-edit'></i></button></td>
                                     <td> <button class="btn btn-danger" type="submit" value="{{project.pid}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ project.projectname }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>
                                     </tr>

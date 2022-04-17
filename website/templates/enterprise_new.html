@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}事業單位新增{% endblock %} 
-{% block head %}事業單位新增{% endblock %}
+{% block title %}
+    {% if Enterprisedata %}事業單位編輯{% else %}事業單位新增{% endif %}
+{% endblock %} 
 
+{% block head %}
+    {% if Enterprisedata %}事業單位編輯{% else %}事業單位新增{% endif %} 
+{% endblock %}
 
 {% block content %}
 

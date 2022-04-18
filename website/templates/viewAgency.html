@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}勞動檢查機構新增{% endblock %} 
-{% block head %}勞動檢查機構新增{% endblock %}
+{% block title %}
+{% if type=="add" %}勞動檢查機構新增{%else%}勞動檢查機構編輯{%endif%}
+{% endblock %} 
+
+{% block head %}
+{% if type=="add" %}勞動檢查機構新增{%else%}勞動檢查機構編輯{%endif%}
+{% endblock %}
 
 
 {% block content %}

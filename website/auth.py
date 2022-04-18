@@ -50,6 +50,8 @@ def signup():
 
 		if (len(account)<1 or len(username)<1 or len(password)<1):
 			flash('不能有空值！', category = 'error')
+		elif (len(account)>10 or len(username)>10 or len(password)>10):
+			flash('帳號長度過長', category = 'error')
 		else:
 			# 檢查是否註冊過
 			cursor.execute("SELECT ACCOUNT FROM USERACCOUNT")
@@ -77,5 +79,5 @@ def signup():
 				new_user.id = newmid
 				login_user(new_user,remember = True)
 				flash('註冊成功', category='success')
-				return redirect(url_for('views.home'))
+				return redirect(url_for('views.index'))
 	return render_template("signup.html", user=current_user)

@@ -1,7 +1,9 @@
 # store routes
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
+from flask import jsonify
 from website import connectDB
+from json import dumps
 import random, string
 from datetime import datetime
 
@@ -136,10 +138,7 @@ def index():
                                         agency_data = agency_data, 
                                         user = current_user)
 
-@views.route('/home')
-def home():
-    return render_template("home.html", user = current_user)
-            
+
 # 新增職災基本資訊
 @views.route('/viewWorkInjury', methods=['GET', 'POST'])
 @login_required
@@ -314,6 +313,7 @@ def show_workinjury(wid):
                 'note': data[14],
         }
         return info
+
     else:
         return None
 
@@ -322,7 +322,7 @@ def workInjury():
             SELECT 
                 w.wid,p.pid,i.iid, w.wdate,
                 i.injuryname, w.num,p.projectname,
-                e.enterprisename,w.agencyname
+                e.enterprisename,w.agencyname,e.eid
 
             FROM workinjury w                
                 LEFT JOIN enterprise e
@@ -351,6 +351,7 @@ def workInjury():
             'projectname': i[6],
             'enterprisename': i[7],
             'agencyname': i[8],
+            'eid': i[9],
         }
         info_data.append(info)
     return info_data
@@ -392,6 +393,93 @@ def agency():
         }
         info_data.append(info)
     return info_data
+
+@views.route('/get_detail')
+def get_prediction():
+    word = request.values.get('word')
+    infotype = request.values.get('infotype')
+    if infotype == 'a':
+        result = agencyInfo(word)
+    elif infotype == 'e':
+        result = enterpriseInfo(word)
+    elif infotype == 'p':
+        result = projectInfo(word)
+    print(result)
+    
+    return jsonify({'result':result})
+
+def enterpriseInfo(eid):
+    sql = """SELECT * 
+        FROM enterprise e
+            LEFT JOIN industry i
+            ON e.inid = i.inid
+        WHERE eid=:eid
+        """
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'eid':eid,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'eid': data[0],
+                'address': data[1],
+                'enterpriseno': data[2],
+                'principal': data[3],
+                'capital': data[4],
+                'inid': data[5],
+                'enterprisename': data[6],
+                'industryname': data[9],
+        }
+        return info
+    else:
+        return None    
+
+def projectInfo(pid):
+    sql = """
+        SELECT * 
+        FROM poject p       
+            LEFT JOIN enterprise e
+            ON p.eid = e.eid
+        WHERE pid=:pid
+    """
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'pid':pid,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'pid': data[0],
+                'projectname': data[1],
+                'eid': data[2],
+                'enterprisename': data[9],
+        }
+        return info
+    else:
+        return None    
+
+def agencyInfo(agencyname):
+    sql = "SELECT * FROM laboragency WHERE agencyname=:agencyname"
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'agencyname':agencyname,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'agencyname': data[0],
+                'phone': data[1],
+                'address': data[2],
+                'area': data[3],
+                'url': data[4]
+        }
+        return info
+    else:
+        return None
 
 def enterprise():
     sql = "SELECT eid,enterprisename FROM enterprise"

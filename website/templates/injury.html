@@ -9,7 +9,7 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-{% if user.mid %}
+{% if (user.mid) and (user.role==0) %}
 <a href="{{ url_for('injury.viewInjury') }}">
     <button class="btn btn-info" type="button">新增災害類別資料</button>
 </a><br><br>
@@ -75,7 +75,7 @@
                             <th>災害編號</th>
                             <th>災害名稱</th>
                             <th>災害敘述</th>
-                            {% if user.mid %}
+                            {% if (user.mid) and (user.role==0) %}
                                 <th>編輯</th>
                                 <th>刪除</th>
                             {% endif %}
@@ -86,7 +86,7 @@
                             <th>災害編號</th>
                             <th>災害名稱</th>
                             <th>災害敘述</th>
-                            {% if user.mid %}
+                            {% if (user.mid) and (user.role==0) %}
                                 <th>編輯</th>
                                 <th>刪除</th>
                             {% endif %}
@@ -95,7 +95,7 @@
                     <col width="10%"/>
                     <col width="15%"/>
                     <col width="20%"/>
-                    {% if user.mid %}
+                    {% if (user.mid) and (user.role==0) %}
                         <col width="5%"/>                  
                         <col width="5%"/> 
                     {% endif %}                                
@@ -105,14 +105,14 @@
                                 <td> {{ i.iId }}</td>
                                 <td> {{ i.injuryName }}</td>
                                 <td> {{ i.injuryDesc }}</td>
-                                {% if user.mid %}
+                                {% if (user.mid) and (user.role==0) %}
                                     <td>
                                         <button class="btn btn-info" type="submit" value="{{i.iId}}" name="edit">
                                             <i class='fa fa-edit'></i>
                                         </button>                                
                                     </td>
                                     <td>
-                                        <button class="btn btn-danger" type="submit" value="{{i.iId}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ i.iId }}\' 災害類型嗎？'))">                               
+                                        <button class="btn btn-danger" type="submit" value="{{i.iId}}" name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除 \'{{ i.injuryName }}\' 災害嗎？'))">                               
                                             <i class='fa fa-trash-alt'></i>
                                         </button>
                                     </td>

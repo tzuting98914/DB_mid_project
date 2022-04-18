@@ -153,7 +153,7 @@ def update():
 		up_eCap = request.values.get('eCap')
 		up_ePri = request.values.get('ePri')
 		up_eAdd = request.values.get('eAddress')
-		print(up_eCap)
+		# print(up_eCap)
 		cursor.prepare("""UPDATE ENTERPRISE 
 						  SET 
 						  	ENTERPRISENO=:up_eNo,
@@ -180,7 +180,7 @@ def update():
 	# 編輯資料
 	elif(request.values.get('edit')):
 		eid = request.values.get('edit')
-		print(eid)
+		# print(eid)
 		cursor.prepare("SELECT * FROM ENTERPRISE NATURAL JOIN INDUSTRY WHERE EID =:eid")
 		cursor.execute(None, {'eid':eid})
 		connection.commit()

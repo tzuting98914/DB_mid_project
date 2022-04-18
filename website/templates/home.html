@@ -3,7 +3,7 @@
 {% block title %}職災管理{% endblock %} 
 {% block head %}職災管理{% endblock %}
 {% block content %}
-
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <!-- Custom css for this template -->
     <link href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}} rel="stylesheet">
 
@@ -78,22 +78,46 @@
         </form>
     </div>
 
+    
     <!-- Modal -->
     <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="viewModalLabel">事業單位</h5>
+            <h5 class="modal-title" id="viewModalLabel"></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
             </div>
             <div class="modal-body">
-            ...
+
+                <div id = 'project-detail' style="display: none;">
+                    工程編號：<p id="ppid"></p>
+                    工程名稱：<p id="pname"></p>
+                    業主名稱：<p id="penterprisename"></p>
+                </div>
+
+                <div id = 'enterprise-detail' style="display: none;">
+                    事業單位編號：<p id="eid"></p>
+                    事業單位名稱：<p id="enterprisename"></p>
+                    統一編號：<p id="enterpriseno"></p>
+                    產業別：<p id="industryname"></p>
+                    資本額：<p id="capital"></p>
+                    負責人：<p id="principal"></p>
+                    地址：<p id="address"></p>
+                </div>
+
+                <div id = 'agency-detail' style="display: none;">
+                    勞動檢查機構名稱：<p id="aname"></p>
+                    電話：<p id="aphone"></p>
+                    地址：<p id="aaddress"></p>
+                    檢查責任區域：<p id="aarea"></p>
+                    網址：<p id="aurl"></p>
+                </div>
             </div>
+
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
         </div>
@@ -163,22 +187,23 @@
                                 <tr>
                                     <td> {{ info.wid }}</td>
                                     <td> 
-                                        <a href="#" class="stretched-link" data-toggle="modal" data-target="#viewModal">
+                                        <a type='button' class="pBtn" at="{{ info.pid }}" data-toggle="modal" data-target="#viewModal" >
                                             {{ info.projectname }}
-                                        </a>                                        
+                                        </a>
                                     </td>
                                     <td> {{ info.wdate }}</td>
                                     <td> {{ info.num }}</td>
                                     <td> {{ info.injuryname }}</td>
-                                    <td>                                         
-                                        <a href="#" class="stretched-link" data-toggle="modal" data-target="#viewModal">
+                                    <td> 
+                                        <a type='button' class="eBtn" at="{{ info.eid }}" data-toggle="modal" data-target="#viewModal" >
                                             {{ info.enterprisename }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="#" class="stretched-link" data-toggle="modal" data-target="#viewModal">
+                                        <a type='button' class="aBtn" at="{{ info.agencyname }}" data-toggle="modal" data-target="#viewModal" >
                                             {{ info.agencyname }}
                                         </a>
+                                    
                                     </td>
                                     {% if user.role is defined %}
                                         <td>
@@ -200,4 +225,93 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        $(document).ready(function() {
+
+            // 工程
+           $('.pBtn').click(function(){
+                $("#project-detail").show();
+               var word = $(this).attr('at');
+               $.ajax({
+               url: "/get_detail",
+               type: "get",
+               data: {word: word,infotype: "p"},
+               success: function(response) {
+                   console.log(response);
+                   res = response.result                       
+                   $(".modal-title").html("工程");
+                   $("#ppid").html(res['pid']);
+                   $("#pname").html(res['projectname']);
+                   $("#penterprisename").html(res['enterprisename']);
+
+              },
+              error: function(xhr) {
+                //Do Something to handle error
+             }
+             });
+           });
+
+            // 事業單位
+            $('.eBtn').click(function(){
+            $("#enterprise-detail").show();
+            var word = $(this).attr('at');
+            $.ajax({
+            url: "/get_detail",
+            type: "get",
+            data: {word: word,infotype: "e"},
+            success: function(response) {
+                console.log(response);
+                res = response.result                       
+                $(".modal-title").html("事業單位");
+
+                $("#eid").html(res['eid']);
+                $("#enterpriseno").html(res['enterpriseno']);
+                $("#enterprisename").html(res['enterprisename']);
+                $("#capital").html(res['capital']);
+                $("#principal").html(res['principal']);
+                $("#address").html(res['address']);
+                $("#industryname").html(res['industryname']);
+
+            },
+            error: function(xhr) {
+            //Do Something to handle error
+            }
+            });
+        });
+        
+
+           // 勞動檢查機構
+           $('.aBtn').click(function(){
+            $("#agency-detail").show();
+           var word = $(this).attr('at');
+           $.ajax({
+           url: "/get_detail",
+           type: "get",
+           data: {word: word,infotype: "a"},
+           success: function(response) {
+               console.log(response);
+               res = response.result                       
+               $(".modal-title").html("勞動檢查機構");
+               $("#aname").html(res['agencyname']);
+               $("#aphone").html(res['phone']);
+               $("#aaddress").html(res['address']);
+               $("#aarea").html(res['area']);
+               $("#aurl").html(res['url']);
+          },
+          error: function(xhr) {
+            //Do Something to handle error
+         }
+         });
+       });
+
+       $('#viewModal').on('hidden.bs.modal', function (e) {
+        console.log("hide")
+        $("#project-detail").hide();
+        $("#enterprise-detail").hide();
+        $("#agency-detail").hide();
+      })
+
+        });
+      </script>
 {% endblock %}

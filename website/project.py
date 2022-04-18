@@ -74,10 +74,12 @@ def update():
 	# 新增資料
 	if (request.values.get('add')):
 		# 系統生成新的eid
-		cursor.execute('SELECT EID FROM POJECT WHERE ROWNUM =1 ORDER BY PID DESC')
+		cursor.execute('SELECT PID FROM POJECT WHERE ROWNUM =1 ORDER BY PID DESC')
 		lastProject = cursor.fetchone()
 		lastPid = lastProject[0]
-		newPid = "P"+str(int(re.search('\d+',lastPid).group(0)) + 1).zfill(9)		
+		
+		newPid = "P"+str(int(re.search('\d+',lastPid).group(0)) + 1).zfill(9)	
+		
 		# print(lastEid)
 		if request.method == 'POST':
 			# request得到的data

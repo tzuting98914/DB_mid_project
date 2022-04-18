@@ -9,7 +9,7 @@
 
 
     <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-    {% if user.mid %}
+    {% if (user.mid) and (user.role==0) %}
     <a href="{{ url_for('agency.viewAgency') }}">
         <button class="btn btn-info" type="button">新增勞檢單位資料</button>
     </a><br><br>
@@ -86,7 +86,7 @@
                                 <th>地址</th>
                                 <th>檢查責任區域</th>
                                 <th>網址</th>
-                                {% if user.mid %}
+                                {% if (user.mid) and (user.role==0) %}
                                     <th>編輯</th>
                                     <th>刪除</th>
                                 {% endif %}
@@ -99,18 +99,18 @@
                                 <th>地址</th>
                                 <th>檢查責任區域</th>
                                 <th>網址</th>
-                                {% if user.mid %}
+                                {% if (user.mid) and (user.role==0) %}
                                     <th>編輯</th>
                                     <th>刪除</th>
                                 {% endif %}
                             </tr>
                         </tfoot>  
-                        <col width="20%"/>
-                        <col width="12%"/>
-                        <col width="15%"/>
                         <col width="15%"/>
                         <col width="10%"/>
-                        {% if user.mid %}
+                        <col width="10%"/>
+                        <col width="15%"/>
+                        <col width="10%"/>
+                        {% if (user.mid) and (user.role==0) %}
                             <col width="5%"/>                  
                             <col width="5%"/> 
                         {% endif %}                                
@@ -122,7 +122,7 @@
                                     <td> {{ i.address }}</td>
                                     <td> {{ i.area }}</td>
                                     <td><a href="{{ i.url }}">{{ i.url }}</a></td>
-                                    {% if user.mid %}
+                                    {% if (user.mid) and (user.role==0) %}
                                         <td>
                                             <button class="btn btn-info" type="submit" value="{{i.agencyName}}" name="edit">
                                                 <i class='fa fa-edit'></i>

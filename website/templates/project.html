@@ -40,8 +40,7 @@
                         <label class="small mb-1">
                             <text>業主名稱</text>
                         </label><br>
-                        <!--<select class="form-control" name="eId_search"> -->
-                            <select class="form-control" data-live-search="true">
+                        <select class="form-control" name="eId_search">
                             <option value="" disabled selected>請選擇業主...</option>
                             {% for enterprise in enterpriseData %}
                                 <option value="{{ enterprise.eid }}">{{ enterprise.enterpriseName }}</option>

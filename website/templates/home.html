@@ -8,9 +8,12 @@
     <link href={{url_for('static',filename = 'vendor/datatables/dataTables.bootstrap4.min.css')}} rel="stylesheet">
 
     <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-    <a href="{{ url_for('views.viewWorkInjury') }}">
-        <button class="btn btn-info" type="button">新增職災資料</button>
-    </a><br><br>
+
+    {% if user.role is defined %}
+        <a href="{{ url_for('views.viewWorkInjury') }}">
+            <button class="btn btn-info" type="button">新增職災資料</button>
+        </a><br><br>
+    {% endif %}
 
     <div class="card mb-4 py-3 border-left-primary">
         <div class="card-body">
@@ -264,7 +267,6 @@
                 console.log(response);
                 res = response.result                       
                 $(".modal-title").html("事業單位");
-
                 $("#eid").html(res['eid']);
                 $("#enterpriseno").html(res['enterpriseno']);
                 $("#enterprisename").html(res['enterprisename']);
@@ -309,6 +311,7 @@
         $("#project-detail").hide();
         $("#enterprise-detail").hide();
         $("#agency-detail").hide();
+        $(".modal-title").html("");
       })
 
         });

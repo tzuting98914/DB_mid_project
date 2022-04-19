@@ -86,7 +86,7 @@ def index():
                 SELECT 
                     w.wid,p.pid,i.iid, w.wdate,
                     i.injuryname, w.num,p.projectname,
-                    e.enterprisename,w.agencyname
+                    e.enterprisename,w.agencyname, e.eid
                 FROM workinjury w                
                     LEFT JOIN enterprise e
                     ON w.eid = e.eid                
@@ -124,6 +124,7 @@ def index():
                 'projectname': i[6],
                 'enterprisename': i[7],
                 'agencyname': i[8],
+                'eid': i[9],
             }
             info_data.append(info)
             
@@ -405,11 +406,13 @@ def get_prediction():
         result = enterpriseInfo(word)
     elif infotype == 'p':
         result = projectInfo(word)
+        
     print(result)
     
     return jsonify({'result':result})
 
 def enterpriseInfo(eid):
+    print("eid____",eid)
     sql = """SELECT * 
         FROM enterprise e
             LEFT JOIN industry i
@@ -497,10 +500,6 @@ def enterprise():
 
 
 # 統計職災基本資訊
-# @views.route('/plot', methods=['GET', 'POST'])
-# def plot():
-#     return render_template("plot.html")                   
-
 @views.route('/plot')
 def plot():
     revenue = []

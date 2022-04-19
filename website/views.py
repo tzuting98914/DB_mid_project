@@ -6,6 +6,7 @@ from website import connectDB
 from json import dumps
 import random, string
 from datetime import datetime
+from website.tool import *
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -151,8 +152,8 @@ def viewWorkInjury():
     injurytype_data = injurytype()
     agency_data = agency()
                 
-    # 新增職災資料
-    if request.method == 'POST':    
+    # 新增或編輯職災按鈕
+    if request.method == 'POST':
              
         # 抓取form資料
         eid = request.values.get('eid')
@@ -168,64 +169,72 @@ def viewWorkInjury():
         wdate = str(datetime.strptime(wdate, '%Y-%m-%d'))
         format = 'yyyy/mm/dd hh24:mi:ss'
         
-        print("request.form['submitBtn']",request.form['submitBtn'])
-        # 新增職災資訊
-        if request.form['submitBtn'] == "add":        
-            # 確認資料庫中wid不重複
-            cursor.prepare('SELECT * FROM WORKINJURY WHERE wId=:wid')
-            data = ""
-            while ( data != None): 
-                number = str(random.randrange( 10000, 99999))
-                wid = "w" + number             
-                cursor.execute(None, {'wid':wid})
-                data = cursor.fetchone()            
-            print(
-                wid,eid,pid,agencyname,
+        # # 清理字串中的空白
+        # info['location'] = stripStr(info['location'])
+        # info['note'] = stripStr(info['note'])
+        # info['address'] = stripStr(info['address'])        
+        
+        note_len = 200 # 備註的字數
+        # 使用者沒有輸入
+        if (len(eid) < 1):
+            print("no eid",eid)
+            flash('請輸入事業單位', category='error')
+        elif len(agencyname) < 1:
+            print("no agencyname",agencyname)
+            flash('請輸入勞檢機構', category='error')            
+            # return
+        elif len(iid) < 1:
+            print("no iid",iid)
+            flash('請輸入災害類型', category='error')        
+        elif checkLength(note,note_len):                
+            flash(f'備註欄位最多為{note_len}字', category='error')
+        
+        print(
+                eid,pid,agencyname,
                 iid,location,wdate,
                 num,note,address
             )
 
-            # 使用者沒有輸入
-            if (len(eid) < 1):
-                print("no eid",eid)
-                flash('請輸入事業單位', category='error')
-            elif len(agencyname) < 1:
-                print("no agencyname",agencyname)
-                flash('請輸入勞檢機構', category='error')            
-                # return
-            elif len(iid) < 1:
-                print("no iid",iid)
-                flash('請輸入災害類型', category='error')
-            else:                    
-                sql = """
-                        INSERT INTO workinjury w ( 
-                            wid,eid,pid,agencyname,
-                            iid,location,wdate,
-                            num,note,address)
-                        VALUES 
-                            (:wid, :eid, :pid, :agencyname,
-                            :iid,:location, TO_DATE( :wdate, :format ) , 
-                            :num, :note, :address )
-                    """
-                cursor.prepare(sql)
-                cursor.execute(None, {
-                    'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
-                    'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
-                    'num':num , 'note':note, 'address':address            
-                    })
-                connection.commit()
-                print("新增資料成功")
-                flash('新增資料成功！', category='success')
-                
-                info = show_workinjury(wid)                
-                wid = info['wid']                                
-                if info != None:
-                    return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
-                else:               
-                    flash('資料庫發生問題，請聯繫管理員', category='error')
+        # 按下新增職災按鈕
+        if request.form['submitBtn'] == "add":         
+            print('新增職災資料')
+            # 確認資料庫中wid不重複
+            cursor.prepare('SELECT * FROM WORKINJURY WHERE wId=:wid')
+            data = ""
+            while ( data != None): 
+                number = str(random.randrange(100000, 999999))
+                wid = "w" + number             
+                cursor.execute(None, {'wid':wid})
+                data = cursor.fetchone()       
 
-        else:
-            print("編輯職災資訊")          
+            sql = """
+                    INSERT INTO workinjury w ( 
+                        wid,eid,pid,agencyname,
+                        iid,location,wdate,
+                        num,note,address)
+                    VALUES 
+                        (:wid, :eid, :pid, :agencyname,
+                        :iid,:location, TO_DATE( :wdate, :format ) , 
+                        :num, :note, :address )
+                """
+            cursor.prepare(sql)
+            cursor.execute(None, {
+                'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
+                'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
+                'num':num , 'note':note, 'address':address            
+                })
+            connection.commit()
+            flash('新增資料成功！', category='success')            
+            
+            info = show_workinjury(wid)                
+            wid = info['wid']                                
+            if info != None:
+                return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
+            else:               
+                flash('資料庫發生問題，請聯繫管理員', category='error')
+
+        # 按下編輯職災按鈕
+        else:            
             wid = request.args['wid']                        
             sql = """
                     UPDATE workinjury 
@@ -251,15 +260,14 @@ def viewWorkInjury():
                         
             connection.commit()
             flash('更新資料成功！', category='success')
-            info = show_workinjury(wid)
-            # print("info__after update",info)
-            
+            info = show_workinjury(wid)            
             return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
     else:
         # 編輯頁面
-        if 'wid' in request.args:        
+        if 'wid' in request.args:    
+            print("進入編輯頁面")    
             wid = request.args['wid']
-            info = show_workinjury(wid)
+            info = show_workinjury(wid)            
             return render_template("viewWorkInjury.html", data=info,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
@@ -313,7 +321,7 @@ def show_workinjury(wid):
                 'industryname': data[12],
                 'eid': data[13],
                 'note': data[14],
-        }
+        }                
         return info
 
     else:
@@ -405,14 +413,10 @@ def get_prediction():
     elif infotype == 'e':
         result = enterpriseInfo(word)
     elif infotype == 'p':
-        result = projectInfo(word)
-        
-    print(result)
-    
+        result = projectInfo(word)    
     return jsonify({'result':result})
 
 def enterpriseInfo(eid):
-    print("eid____",eid)
     sql = """SELECT * 
         FROM enterprise e
             LEFT JOIN industry i

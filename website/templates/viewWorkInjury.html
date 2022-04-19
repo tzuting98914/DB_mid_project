@@ -145,9 +145,7 @@
                     <text>肇事位置</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="location">
-                            {{ data.location if data.location is not none }}
-                        </textarea>
+                        <textarea class="form-control" rows="2" name="location">{{ data.location if data.location is not none}}</textarea>
                     {% else %}
                         <textarea class="form-control" rows="2" name="location"></textarea>
                     {% endif %}
@@ -158,9 +156,7 @@
                     <text>肇事地址</text>
                 </label>                                                    
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="address">
-                            {{ data.address if data.address is not none }}
-                        </textarea> 
+                        <textarea class="form-control" rows="2" name="address">{{ data.address if data.address is not none}}</textarea> 
                     {% else %}
                         <textarea class="form-control" rows="2" name="address"></textarea>
                     {% endif %}
@@ -171,9 +167,7 @@
                     <text>備註</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="note">
-                            {{ data.note if data.note is not none }}
-                        </textarea>
+                        <textarea class="form-control" rows="2" name="note">{{ data.note if data.note is not none}}</textarea>
                     {% else %}
                         <textarea class="form-control" rows="2" name="note"></textarea>
                     {% endif %}

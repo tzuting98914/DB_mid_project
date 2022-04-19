@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if data %}災害別編輯{% else %}災害別新增{% endif %}
+{% endblock %} 
+
+{% block head %}
+    {% if data %}災害別編輯{% else %}災害別新增{% endif %} 
+{% endblock %}
+
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">詳細資訊</h6>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="small mb-1">災害別編號</label><br>                        
+                        {% if data %}
+                            <label>{{ data.iId }}</label>  
+                        {% else %}
+                            <label>* 未生成</label>  
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+
+
+            <div class="form-row">
+                <label class="small mb-1">
+                    <text>災害名稱</text>
+                </label>                                                    
+                    {% if data %}
+                        <textarea class="form-control" rows="1" name="injuryName">{{ data.injuryName }}</textarea> 
+                    {% else %}
+                        <textarea class="form-control" rows="1" name="injuryName"></textarea>
+                    {% endif %}
+            </div>
+            
+
+            <div class="form-group">
+                <label class="small mb-1">
+                    <text>災害敘述</text>
+                </label>                                                    
+                    {% if data %}
+                        <textarea class="form-control" rows="2" name="injuryDesc">{{ data.injuryDesc }}</textarea> 
+                    {% else %}
+                        <textarea class="form-control" rows="2" name="injuryDesc"></textarea>
+                    {% endif %}
+            </div>
+   
+            {% if type=="add" %}
+            <button class="btn btn-info" type="submit" name="submitBtn" value="add">
+                新增資料
+            </button> 
+            {% else %}
+            <button class="btn btn-info" type="submit" name="submitBtn" value="edit">
+                編輯資料
+            </button> 
+            {% endif %}
+
+            <a href="{{ url_for('injury.Injury') }}">
+                <button class="btn btn-info" type="button">回上一頁</button>
+            </a>
+        </form>        
+    </div>
+{% endblock %}

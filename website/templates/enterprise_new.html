@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}事業單位新增{% endblock %} 
-{% block head %}事業單位新增{% endblock %}
+{% block title %}
+    {% if Enterprisedata %}事業單位編輯{% else %}事業單位新增{% endif %}
+{% endblock %} 
 
+{% block head %}
+    {% if Enterprisedata %}事業單位編輯{% else %}事業單位新增{% endif %} 
+{% endblock %}
 
 {% block content %}
 
@@ -32,9 +36,11 @@
                     <div class="form-group">
                         <label class="small mb-1">統一編號</label>
                         {% if Enterprisedata %}
-                            <input class="form-control" name="eNo" value="{{ Enterprisedata[2] }}" >
+                            <input class="form-control" name="eNo" value="{{ Enterprisedata[2] }}" maxlength=10 minlength=10 
+                            onkeyup="value=this.value.replace(/\D+/g,'')">
                         {% else %}
-                            <input class="form-control "name="eNo" >  
+                            <input class="form-control "name="eNo"  maxlength=10 minlength=10 
+                            onkeyup="value=this.value.replace(/\D+/g,'')">  
                         {% endif %} 
                     </div>
                 </div>
@@ -57,9 +63,9 @@
             <div class="form-group">
                 <label class="small mb-1">* 公司名稱</label>
                 {% if Enterprisedata %}
-                    <input class="form-control" name="eName" value="{{ Enterprisedata[6] }}" required>
+                    <input class="form-control" name="eName" value="{{ Enterprisedata[6] }}" maxlength=150 required>
                 {% else %}
-                    <input class = "form-control" name = "eName" required></input> 
+                    <input class = "form-control" name = "eName" maxlength=150 required></input> 
                 {% endif %} 
             </div>
             <div class="form-row">
@@ -67,9 +73,11 @@
                     <div class="form-group">
                         <label class="small mb-1">資本額</label>
                         {% if Enterprisedata %}
-                            <input class="form-control" name="eCap" value="{{ Enterprisedata[3] }}">
+                            <input class="form-control" name="eCap" value="{{ Enterprisedata[3] }}" maxlength=15 
+                            onkeyup="value=this.value.replace(/\D+/g,'')">
                         {% else %}
-                            <input class = "form-control" name = "eCap"></input>
+                            <input class = "form-control" name = "eCap" maxlength=15
+                            onkeyup="value=this.value.replace(/\D+/g,'')"></input>
                         {% endif %}
                     </div>
                 </div>
@@ -77,9 +85,9 @@
                     <div class="form-group">
                         <label class="small mb-1">代表人</label>
                         {% if Enterprisedata %}
-                            <input class="form-control" name="ePri" value="{{ Enterprisedata[4] }}">
+                            <input class="form-control" name="ePri" value="{{ Enterprisedata[4] }}" maxlength=45>
                         {% else %}
-                            <input class = "form-control" name = "ePri"></input>
+                            <input class = "form-control" name = "ePri" maxlength=45></input>
                         {% endif %}
                     </div>
                 </div>
@@ -87,9 +95,9 @@
             <div class="form-group">
                 <label class="small mb-1">地址</label>
                 {% if Enterprisedata %}
-                    <textarea class="form-control" rows="2" name="eAddress" value="{{ Enterprisedata[5] }}">{{ Enterprisedata[5] }}</textarea> 
+                    <textarea class="form-control" rows="2" name="eAddress" value="{{ Enterprisedata[5] }}" maxlength=200>{{ Enterprisedata[5] }}</textarea> 
                 {% else %}
-                    <textarea class="form-control" rows="2" name="eAddress"></textarea> 
+                    <textarea class="form-control" rows="2" name="eAddress" maxlength=200></textarea> 
                 {% endif %}
             </div>
             {% if Enterprisedata %}

@@ -9,7 +9,7 @@ class User(UserMixin):
 def create_app():
 	app = Flask(__name__)
 	app.config['SECRET_KEY'] = 'sdojrie'
-	cx_Oracle.init_oracle_client(lib_dir='../../instantclient_19_8')
+	cx_Oracle.init_oracle_client(lib_dir=r'C:\Users\Ziting\Downloads\instantclient_21_3')
 	connection = connectDB()
 	cursor = connection.cursor()
 	
@@ -17,11 +17,17 @@ def create_app():
 	from .auth import auth
 	from .project import project
 	from .enterprise import enterprise
+	from .industry import industry
+	from .injury import injury
+	from .agency import agency
 
 	app.register_blueprint(views, url_prefix = '/')
 	app.register_blueprint(auth, url_prefix = '/')
 	app.register_blueprint(project, url_prefix = '/')
 	app.register_blueprint(enterprise, url_prefix = '/')
+	app.register_blueprint(industry, url_prefix='/')
+	app.register_blueprint(injury, url_prefix='/')
+	app.register_blueprint(agency, url_prefix='/')
 
 	login_manager = LoginManager()
 	login_manager.login_view = 'auth.login'

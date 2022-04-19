@@ -9,7 +9,7 @@
     rel="stylesheet">
 
 <p class="mb-4">資料來源：勞動部職業災和記載列表</p>
-{% if (user.role == 1 )%}
+{% if user.role is defined %}
     <form method="get" action={{ url_for('enterprise.update') }}>
         <button class="btn btn-info" type="submit" name="add" value="add">
             新增事業單位資料
@@ -94,13 +94,13 @@
     </form>
 </div>
 
-
-<script type="text/javascript">
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-})
-</script>
+    <p class="mb-4">
+        {% if enterpriseData|length < 1  %}
+            無符合條件的資料，請更換搜尋條件    
+        {% else %}
+            共 {{ enterpriseData|length }} 筆資料
+        {% endif %}
+    </p>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
@@ -110,8 +110,9 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <form  method='post'>
+            <form  method='get' action = {{ url_for('enterprise.update') }}>
                 <table class="table table-bordered" id="enterpriseTable" width="100%" cellspacing="0">
+                    <a class="btn btn-primary" href="{{ url_for('enterprise.showEnterprise')}}" style="left">清除搜尋條件</a>
 					<thead>
 						<tr>
 						  <th scope="col">序號</th>
@@ -121,22 +122,22 @@
 						  <th scope="col">代表人</th>
 						  <th scope="col">地址</th>
 						  <th scope="col">行業別</th>
-                          {% if (user.role == 1 )%}  
+                          {% if user.role is defined %}  
 						  <th scope="col">修改</th>
                           <th scope="col">刪除</th>
                           {% endif %}
 						</tr>
 					  </thead>
-					  <col width="5%"/>
-						<col width="8%"/>
-						<col width="20%"/>
+					  <col width="7%"/>
+						<col width="10%"/>
+						<col width="17%"/>
 						<col width="9%"/>                  
-						<col width="7%"/>                  
-						<col width="25%"/>                  
-						<col width="16%"/>  
-                        {% if (user.role == 1 )%}                  
-						<col width="5%"/>
-                        <col width="5%"/>
+						<col width="9%"/>                  
+						<col width="21%"/>                  
+						<col width="12%"/>  
+                        {% if user.role is defined %}                  
+						<col width="7%"/>
+                        <col width="7%"/>
                         {% endif %}
 						<tbody>
 							{% for enterprise in enterpriseData %}
@@ -148,9 +149,9 @@
 							  <td> {{ enterprise.principal }}</td>
 							  <td> {{ enterprise.address }}</td>
 							  <td> {{ enterprise.industryType }}</td>
-                              {% if (user.role == 1 )%}  
+                              {% if user.role is defined %}  
                                 <td><button class="btn btn-info" type="submit" name="edit" value={{ enterprise.eid }}><i class='fa fa-edit'></i></button></td>
-                                <td> <button class="btn btn-danger" type="submit" value={{enterprise.eid}} name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.公司名稱 }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
+                                <td> <button class="btn btn-danger" type="submit" value={{enterprise.eid}} name="delete" onclick="return (confirm('刪除後無法復原，您確定要刪除「 {{ enterprise.enterpriseName }} 」的資料嗎？'))"><i class='fa fa-trash-alt'></i></button></td>	
                                 </tr>
                              {% endif %}
 							{% endfor %}

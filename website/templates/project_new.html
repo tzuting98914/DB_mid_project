@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}工程新增{% endblock %} 
-{% block head %}工程新增{% endblock %}
+{% block title %}
+    {% if ProjectData %}工程編輯{% else %}工程新增{% endif %}
+{% endblock %} 
+
+{% block head %}
+    {% if ProjectData %}工程編輯{% else %}工程新增{% endif %} 
+{% endblock %}
+
 
 
 {% block content %}
@@ -32,9 +38,9 @@
                     <div class="form-group">
                         <label class="small mb-1">工程名稱</label>
                         {% if ProjectData %}
-                            <input class="form-control" name="pName" value="{{ ProjectData[2] }}" >
+                            <input class="form-control" name="pName" value="{{ ProjectData[2] }}"  maxlength=250>
                         {% else %}
-                            <input class="form-control "name="pName" >  
+                            <input class="form-control "name="pName" maxlength=250 >  
                         {% endif %} 
                     </div>
                 </div>

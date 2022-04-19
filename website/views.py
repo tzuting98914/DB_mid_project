@@ -458,7 +458,6 @@ def projectInfo(pid):
                 'eid': data[2],
                 'enterprisename': data[9],
         }
-        print(data)
         return info
     else:
         return None    

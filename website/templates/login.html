@@ -11,7 +11,9 @@
 				class="form-control"
 				id="account"
 				name="account"
-				placeholder="Enter account" required
+				placeholder = "請輸入帳號" 
+				maxlength=20
+				onkeyup="this.value=this.value.replace(/[\u4e00-\u9fa5]/g,'')" required
 			  />
 			</div>
 			<div class="form-group">
@@ -21,7 +23,8 @@
 				class="form-control"
 				id="password"
 				name="password"
-				placeholder="Enter password" required
+				placeholder="請輸入密碼" 
+				maxlength=20 required
 			  />
 			</div>
 			<br />

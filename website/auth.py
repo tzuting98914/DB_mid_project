@@ -47,11 +47,13 @@ def signup():
 		account = request.form.get('account')
 		username = request.form.get('username')
 		password = request.form.get('password')
+		
+		chinese_len = len(re.findall(r"[\u4e00-\u9fa5]",username))
+		other_len = len(username)-chinese_len
+		total_len = chinese_len*4 + other_len
 
-		if (len(account)<1 or len(username)<1 or len(password)<1):
-			flash('不能有空值！', category = 'error')
-		elif (len(account)>10 or len(username)>10 or len(password)>10):
-			flash('帳號長度過長', category = 'error')
+		if (total_len >20):
+			flash('使用者名字長度過長', category = 'error')
 		else:
 			# 檢查是否註冊過
 			cursor.execute("SELECT ACCOUNT FROM USERACCOUNT")

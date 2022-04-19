@@ -8,6 +8,12 @@ cursor = connection.cursor()
 
 enterprise = Blueprint('enterprise', __name__)
 
+def checkLength(text,max):
+	chinese_len = len(re.findall(r"[\u4e00-\u9fa5]",text))
+	other_len = len(text)-chinese_len
+	total_len = chinese_len*4 + other_len
+	return total_len > max
+
 def getIndustry():
 	sql = 'SELECT DISTINCT * FROM INDUSTRY ORDER BY INDUSTRYNAME'
 	cursor.execute(sql)
@@ -136,12 +142,16 @@ def update():
 			new_ePri = request.values.get('ePri')
 			new_eAdd = request.values.get('eAddress')
 
-			# 新增到資料庫中
-			cursor.prepare("INSERT INTO ENTERPRISE VALUES (:new_eid, :new_eNo, :new_eCap, :new_ePri, :new_eAdd, :new_inId, :new_eName)")
-			cursor.execute(None, {'new_eid':new_eid, 'new_eNo':new_eNo, 'new_eCap':new_eCap, 'new_ePri':new_ePri, 'new_eAdd':new_eAdd, 'new_inId':new_inId, 'new_eName':new_eName})
-			connection.commit()
-			flash('新增事業單位資料成功', category='success')
-			return redirect(url_for('enterprise.showEnterprise'))
+			# 檢查有沒有超過設定範圍
+			if(checkLength(new_ePri,45)&checkLength(new_eAdd,200)&checkLength(new_eName,150)):
+				# 新增到資料庫中
+				cursor.prepare("INSERT INTO ENTERPRISE VALUES (:new_eid, :new_eNo, :new_eCap, :new_ePri, :new_eAdd, :new_inId, :new_eName)")
+				cursor.execute(None, {'new_eid':new_eid, 'new_eNo':new_eNo, 'new_eCap':new_eCap, 'new_ePri':new_ePri, 'new_eAdd':new_eAdd, 'new_inId':new_inId, 'new_eName':new_eName})
+				connection.commit()
+				flash('新增事業單位資料成功', category='success')
+				return redirect(url_for('enterprise.showEnterprise'))
+			else:
+				flash('輸入失敗！！！輸入內容超過範圍', category = 'error')
 		return render_template("enterprise_new.html",newEid = newEid,industryData = industryData, user = current_user)
 	# 修改完畢
 	elif(request.values.get('update_finish')):
@@ -153,20 +163,24 @@ def update():
 		up_eCap = request.values.get('eCap')
 		up_ePri = request.values.get('ePri')
 		up_eAdd = request.values.get('eAddress')
-		# print(up_eCap)
-		cursor.prepare("""UPDATE ENTERPRISE 
-						  SET 
-						  	ENTERPRISENO=:up_eNo,
-						  	CAPITAL=:up_eCap,
-							PRINCIPAL=:up_ePri,
-							ADDRESS=:up_eAdd,
-							INID=:up_inId,
-							ENTERPRISENAME=:up_eName
-						  WHERE EID=:eid
-						""")
-		cursor.execute(None, {'eid':eid,'up_eNo':up_eNo,'up_inId':up_inId,'up_eName':up_eName,'up_eCap':up_eCap,'up_ePri':up_ePri,'up_eAdd':up_eAdd})
-		connection.commit()
-		flash('修改事業單位資料成功', category='success')
+		# 檢查有沒有超過設定範圍
+		if(checkLength(up_ePri,45)&checkLength(up_eAdd,200)&checkLength(up_eName,150)):
+	
+			cursor.prepare("""UPDATE ENTERPRISE 
+							SET 
+								ENTERPRISENO=:up_eNo,
+								CAPITAL=:up_eCap,
+								PRINCIPAL=:up_ePri,
+								ADDRESS=:up_eAdd,
+								INID=:up_inId,
+								ENTERPRISENAME=:up_eName
+							WHERE EID=:eid
+							""")
+			cursor.execute(None, {'eid':eid,'up_eNo':up_eNo,'up_inId':up_inId,'up_eName':up_eName,'up_eCap':up_eCap,'up_ePri':up_ePri,'up_eAdd':up_eAdd})
+			connection.commit()
+			flash('修改事業單位資料成功', category='success')
+		else:
+			flash('輸入失敗！！！輸入內容超過範圍', category = 'error')
 		return redirect(url_for('enterprise.showEnterprise'))
 	# 刪除資料
 	elif(request.values.get('delete')):

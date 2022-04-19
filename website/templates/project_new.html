@@ -38,9 +38,9 @@
                     <div class="form-group">
                         <label class="small mb-1">工程名稱</label>
                         {% if ProjectData %}
-                            <input class="form-control" name="pName" value="{{ ProjectData[2] }}" >
+                            <input class="form-control" name="pName" value="{{ ProjectData[2] }}"  maxlength=250>
                         {% else %}
-                            <input class="form-control "name="pName" >  
+                            <input class="form-control "name="pName" maxlength=250 >  
                         {% endif %} 
                     </div>
                 </div>

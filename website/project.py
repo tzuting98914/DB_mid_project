@@ -3,7 +3,7 @@ from website import connectDB
 from flask_login import current_user,login_required
 import re
 from website import enterprise
-from website.enterprise import getEnterprise, get_search_term,enterprise_to_list
+from website.enterprise import getEnterprise, get_search_term,enterprise_to_list,checkLength
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -86,14 +86,16 @@ def update():
 			new_pid = request.values.get('newPid')
 			new_pName = request.values.get('pName')
 			new_eid = request.values.get('eid')
-
-			# 新增到資料庫中
-			cursor.prepare("INSERT INTO POJECT VALUES (:new_pid, :new_pName, :new_eid)")
-			cursor.execute(None, {'new_pid':new_pid, 'new_pName':new_pName, 'new_eid':new_eid})
-			connection.commit()
-			
-			flash('新增工程資料成功', category='success')
-			return redirect(url_for('project.showproject'))
+			if(checkLength(new_pName)):
+				# 新增到資料庫中
+				cursor.prepare("INSERT INTO POJECT VALUES (:new_pid, :new_pName, :new_eid)")
+				cursor.execute(None, {'new_pid':new_pid, 'new_pName':new_pName, 'new_eid':new_eid})
+				connection.commit()
+				
+				flash('新增工程資料成功', category='success')
+				return redirect(url_for('project.showproject'))
+			else:
+				flash('輸入失敗！！！輸入內容超過範圍', category = 'error')
 		return render_template("project_new.html",newPid = newPid,EnterpriseData = EnterpriseData, user = current_user)
 	# 修改完畢
 	elif(request.values.get('update_finish')):
@@ -101,17 +103,19 @@ def update():
 		# request得到的data
 		up_pName = request.values.get('pName')
 		up_eid = request.values.get('eid')
+		if(checkLength(up_pName)):
+			cursor.prepare("""UPDATE POJECT 
+							SET 
+								PROJECTNAME=:up_pName,
+								EID=:up_eid
+							WHERE PID=:pid
+							""")
+			cursor.execute(None, {'up_pName':up_pName,'up_eid':up_eid,'pid':pid})
+			connection.commit()
 
-		cursor.prepare("""UPDATE POJECT 
-						  SET 
-						  	PROJECTNAME=:up_pName,
-							EID=:up_eid
-						  WHERE PID=:pid
-						""")
-		cursor.execute(None, {'up_pName':up_pName,'up_eid':up_eid,'pid':pid})
-		connection.commit()
-
-		flash('修改工程資料成功', category='success')
+			flash('修改工程資料成功', category='success')
+		else:
+			flash('輸入失敗！！！輸入內容超過範圍', category = 'error')
 		return redirect(url_for('project.showproject'))
 	# 刪除資料
 	elif(request.values.get('delete')):

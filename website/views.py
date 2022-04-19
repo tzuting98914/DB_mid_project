@@ -1,5 +1,5 @@
 # store routes
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import login_required, current_user
 from flask import jsonify
 from website import connectDB
@@ -31,8 +31,6 @@ def test():
             'agencyname': i[8],
         }
         info_data.append(info)
-    print("info_data",info_data)
-    print("test_",sql)
 # test()
 
 # 職業災害首頁
@@ -168,27 +166,25 @@ def viewWorkInjury():
         
         wdate = str(datetime.strptime(wdate, '%Y-%m-%d'))
         format = 'yyyy/mm/dd hh24:mi:ss'
-        
+                
         # # 清理字串中的空白
-        # info['location'] = stripStr(info['location'])
-        # info['note'] = stripStr(info['note'])
-        # info['address'] = stripStr(info['address'])        
-        
-        note_len = 200 # 備註的字數
-        # 使用者沒有輸入
-        if (len(eid) < 1):
-            print("no eid",eid)
-            flash('請輸入事業單位', category='error')
-        elif len(agencyname) < 1:
-            print("no agencyname",agencyname)
-            flash('請輸入勞檢機構', category='error')            
-            # return
-        elif len(iid) < 1:
-            print("no iid",iid)
-            flash('請輸入災害類型', category='error')        
-        elif checkLength(note,note_len):                
-            flash(f'備註欄位最多為{note_len}字', category='error')
-        
+        location = stripStr(location)
+        note = stripStr(note)
+        address = stripStr(address)        
+                
+        # todo 如果錯的話，回到頁面沒辦法保存資料
+        # 輸入資料檢查
+        # note_len = 300 # 備註的字數
+        # if (len(eid) < 1):
+        #     flash('請輸入事業單位', category='error')
+        # elif len(agencyname) < 1:
+        #     flash('請輸入勞檢機構', category='error')            
+        #     # return
+        # elif len(iid) < 1:
+        #     flash('請輸入災害類型', category='error')        
+        # elif checkLenUf8(note,note_len):                
+        #     flash(f'備註欄位最多為{note_len}字', category='error')
+                
         print(
                 eid,pid,agencyname,
                 iid,location,wdate,
@@ -266,7 +262,7 @@ def viewWorkInjury():
         # 編輯頁面
         if 'wid' in request.args:    
             print("進入編輯頁面")    
-            wid = request.args['wid']
+            wid = request.args['wid']    
             info = show_workinjury(wid)            
             return render_template("viewWorkInjury.html", data=info,    
                                         enterprise_data = enterprise_data,

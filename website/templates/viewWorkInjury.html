@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">詳細資訊</h6>
@@ -145,9 +145,9 @@
                     <text>肇事位置</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="location">{{ data.location if data.location is not none}}</textarea>
+                        <textarea class="form-control" id='location' rows="2" name="location" maxlength = "100">{{ data.location if data.location is not none}}</textarea>
                     {% else %}
-                        <textarea class="form-control" rows="2" name="location"></textarea>
+                        <textarea class="form-control" id='location' rows="2" name="location" maxlength = "100"></textarea>
                     {% endif %}
             </div>
 
@@ -156,9 +156,9 @@
                     <text>肇事地址</text>
                 </label>                                                    
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="address">{{ data.address if data.address is not none}}</textarea> 
+                        <textarea class="form-control" id='address' rows="2" name="address" maxlength = "100">{{ data.address if data.address is not none}}</textarea> 
                     {% else %}
-                        <textarea class="form-control" rows="2" name="address"></textarea>
+                        <textarea class="form-control" id='address' rows="2" name="address" maxlength = "100"></textarea>
                     {% endif %}
             </div>
 
@@ -167,9 +167,9 @@
                     <text>備註</text>
                 </label>
                     {% if data %}
-                        <textarea class="form-control" rows="2" name="note">{{ data.note if data.note is not none}}</textarea>
+                        <textarea class="form-control" id='note' rows="2" name="note" maxlength = "100">{{ data.note if data.note is not none}}</textarea>
                     {% else %}
-                        <textarea class="form-control" rows="2" name="note"></textarea>
+                        <textarea class="form-control" id='note' rows="2" name="note" maxlength = "100"></textarea>
                     {% endif %}
             </div>     
             
@@ -184,4 +184,34 @@
             </a>
         </form>        
     </div>    
+    <script>
+
+        max_byte = 300
+        max_chr = parseInt(max_byte / 3)
+        $('#location').bind('input propertychange', function() {
+
+            let location_len = new TextEncoder().encode(this.value).length
+            if (location_len > max_byte) {
+              alert("肇事位置字數限"+max_chr+"字，請減少您的字數");
+              $("#location").val($("#location").val().substring(0,max_byte));
+            }
+          });
+
+        $('#address').bind('input propertychange', function() {
+
+            let address_len = new TextEncoder().encode(this.value).length
+            if (address_len > max_byte) {
+            alert("肇事地址字數限" + max_chr + "字，請減少您的字數");
+            $("#address").val($("#address").val().substring(0,max_byte));
+        }
+        });
+
+        $('#note').bind('input propertychange', function() {
+        let note_len = new TextEncoder().encode(this.value).length
+        if (note_len > max_byte) {
+            alert("備註字數限"+max_chr+"字，請減少您的字數");
+            $("#note").val($("#note").val().substring(0,max_byte));
+        }
+        });
+        </script>
 {% endblock %}

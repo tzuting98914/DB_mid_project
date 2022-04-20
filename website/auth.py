@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect,url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from website import connectDB, User
 import re
-from werkzeug.security import generate_password_hash, check_password_hash
+from website.enterprise import checkLength
 
 auth = Blueprint('auth', __name__)
 connection = connectDB()
@@ -47,12 +47,8 @@ def signup():
 		account = request.form.get('account')
 		username = request.form.get('username')
 		password = request.form.get('password')
-		
-		chinese_len = len(re.findall(r"[\u4e00-\u9fa5]",username))
-		other_len = len(username)-chinese_len
-		total_len = chinese_len*4 + other_len
-
-		if (total_len >20):
+		print(checkLength(username,20))
+		if (checkLength(username,20)==False):
 			flash('使用者名字長度過長', category = 'error')
 		else:
 			# 檢查是否註冊過

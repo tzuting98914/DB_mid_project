@@ -11,8 +11,8 @@ enterprise = Blueprint('enterprise', __name__)
 def checkLength(text,max):
 	chinese_len = len(re.findall(r"[\u4e00-\u9fa5]",text))
 	other_len = len(text)-chinese_len
-	total_len = chinese_len*4 + other_len
-	return total_len > max
+	total_len = chinese_len*3 + other_len
+	return total_len < max
 
 def getIndustry():
 	sql = 'SELECT DISTINCT * FROM INDUSTRY ORDER BY INDUSTRYNAME'

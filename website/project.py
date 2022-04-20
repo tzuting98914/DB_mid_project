@@ -86,7 +86,7 @@ def update():
 			new_pid = request.values.get('newPid')
 			new_pName = request.values.get('pName')
 			new_eid = request.values.get('eid')
-			if(checkLength(new_pName)):
+			if(checkLength(new_pName,250)):
 				# 新增到資料庫中
 				cursor.prepare("INSERT INTO POJECT VALUES (:new_pid, :new_pName, :new_eid)")
 				cursor.execute(None, {'new_pid':new_pid, 'new_pName':new_pName, 'new_eid':new_eid})
@@ -103,7 +103,7 @@ def update():
 		# request得到的data
 		up_pName = request.values.get('pName')
 		up_eid = request.values.get('eid')
-		if(checkLength(up_pName)):
+		if(checkLength(up_pName,250)):
 			cursor.prepare("""UPDATE POJECT 
 							SET 
 								PROJECTNAME=:up_pName,

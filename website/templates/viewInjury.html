@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}災害別新增{% endblock %} 
-{% block head %}災害別新增{% endblock %}
+{% block title %}
+    {% if data %}災害別編輯{% else %}災害別新增{% endif %}
+{% endblock %} 
+
+{% block head %}
+    {% if data %}災害別編輯{% else %}災害別新增{% endif %} 
+{% endblock %}
 
 
 {% block content %}

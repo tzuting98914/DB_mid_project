@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, flash, redirect,url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from website import connectDB, User
 import re
+from werkzeug.security import generate_password_hash, check_password_hash
+
 auth = Blueprint('auth', __name__)
 connection = connectDB()
 cursor = connection.cursor()
-
 
 @auth.route('/login', methods=['GET','POST'])
 def login():
@@ -25,7 +26,7 @@ def login():
 				# print(userdata[4])
 				login_user(user,remember = True)
 				flash('登入成功', category='success')
-				return redirect(url_for('views.home'))
+				return redirect(url_for('views.index'))
 			else:
 				flash('密碼錯誤', category='error')
 		else:
@@ -46,9 +47,13 @@ def signup():
 		account = request.form.get('account')
 		username = request.form.get('username')
 		password = request.form.get('password')
+		
+		chinese_len = len(re.findall(r"[\u4e00-\u9fa5]",username))
+		other_len = len(username)-chinese_len
+		total_len = chinese_len*4 + other_len
 
-		if (len(account)<1 or len(username)<1 or len(password)<1):
-			flash('不能有空值！', category = 'error')
+		if (total_len >20):
+			flash('使用者名字長度過長', category = 'error')
 		else:
 			# 檢查是否註冊過
 			cursor.execute("SELECT ACCOUNT FROM USERACCOUNT")
@@ -76,5 +81,5 @@ def signup():
 				new_user.id = newmid
 				login_user(new_user,remember = True)
 				flash('註冊成功', category='success')
-				return redirect(url_for('views.home'))
+				return redirect(url_for('views.index'))
 	return render_template("signup.html", user=current_user)

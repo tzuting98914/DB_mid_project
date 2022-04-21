@@ -1,9 +1,12 @@
 # store routes
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import login_required, current_user
+from flask import jsonify
 from website import connectDB
+from json import dumps
 import random, string
 from datetime import datetime
+from website.tool import *
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -11,7 +14,6 @@ cursor = connection.cursor()
 views = Blueprint('views', __name__)
 
 def test():
-
     sql = "SELECT * FROM workinjury_test FETCH FIRST 3 ROWS ONLY"
     cursor.prepare(sql)
     cursor.execute(None)
@@ -29,8 +31,6 @@ def test():
             'agencyname': i[8],
         }
         info_data.append(info)
-    print("info_data",info_data)
-    print("test_",sql)
 # test()
 
 # 職業災害首頁
@@ -42,7 +42,24 @@ def index():
     injurytype_data = injurytype()
     agency_data = agency()
     
-    # TODO: 除了勞檢單位之外，其他地方的查詢怪怪的 
+    # 刪除職災
+    if 'delete' in request.values:            
+        wid = request.values.get('delete')
+        print("delete", wid)
+        
+        if('w' in wid):
+            cursor.prepare('DELETE FROM workinjury WHERE wid = :wid ')
+            cursor.execute(None, {'wid': wid})
+            connection.commit() # 把這個刪掉
+        else:
+            flash('正式的職災資料，沒辦法刪除喔', category='error') 
+                    
+    # 修改職災
+    elif 'edit' in request.values: 
+            wid = request.values.get('edit')                        
+            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
+
+    # 查詢資料
     if 'search' in request.values:
         wid_search = request.values.get('wid_search')
         estr_search = request.values.get('estr_search')
@@ -56,18 +73,19 @@ def index():
         iid_search = ('%' + iid_search+ '%') if iid_search != None else "%%"        
         agencyname_search = ('%' + agencyname_search+ '%') if agencyname_search != None else '%%'
 
-        print(
-            wid_search+"___"+
-            estr_search+"___"+
-            pstr_search+"___"+
-            iid_search+"___"+
-            agencyname_search
-        )                        
+        # print(
+        #     wid_search+"___"+
+        #     estr_search+"___"+
+        #     pstr_search+"___"+
+        #     iid_search+"___"+
+        #     agencyname_search
+        # )                      
+          
         sql = """
                 SELECT 
                     w.wid,p.pid,i.iid, w.wdate,
                     i.injuryname, w.num,p.projectname,
-                    e.enterprisename,w.agencyname
+                    e.enterprisename,w.agencyname, e.eid
                 FROM workinjury w                
                     LEFT JOIN enterprise e
                     ON w.eid = e.eid                
@@ -82,21 +100,10 @@ def index():
                     i.injuryname LIKE : iid_search AND
                     w.agencyname LIKE : agencyname_search
                                         
-                ORDER BY p.pid FETCH FIRST 100 ROWS ONLY
+                ORDER BY p.pid FETCH FIRST 50 ROWS ONLY
             """
                         
         cursor.prepare(sql)
-        # cursor.execute(None, {
-        #     'estr_search':estr_search,
-        #     'agencyname_search': agencyname_search,       
-        #     })
-        
-        # w.wid LIKE : wid_search AND
-        # e.enterprisename LIKE :estr_search AND
-        # p.projectname LIKE :pstr_search AND
-        # i.injuryname LIKE : iid_search AND        
-        # w.agencyname LIKE : agencyname_search
-
         cursor.execute(None, {
             'wid_search': wid_search, 'estr_search':estr_search, 
             'pstr_search':pstr_search, 'iid_search':iid_search,
@@ -116,65 +123,36 @@ def index():
                 'projectname': i[6],
                 'enterprisename': i[7],
                 'agencyname': i[8],
+                'eid': i[9],
             }
             info_data.append(info)
-        # print("info_data",info_data)
-        return render_template("home.html", info_data=info_data,    
-                                        enterprise_data = enterprise_data,
-                                        project_data = project_data,
-                                        injurytype_data = injurytype_data,
-                                        agency_data = agency_data)
-
-    
-    if 'delete' in request.values: #要刪除            
-        wid = request.values.get('delete')
-        print("delete", wid)
-
-        # todo: 職災刪除條件待討論
-        # cursor.prepare('SELECT * FROM workinjury WHERE wid=:wid')
-        # cursor.execute(None, {'wid':wid})
-        # data = cursor.fetchone() #可以抓一筆就好了，假如有的話就不能刪除        
-        # if(data != None):
-        #     flash('faild')
+            
+    # 剛進入主頁
+    else:
+        # 查看測試資料
+        info_data = workInjury()
         
-        if('w' in wid):
-            cursor.prepare('DELETE FROM workinjury WHERE wid = :wid ')
-            cursor.execute(None, {'wid': wid})
-            connection.commit() # 把這個刪掉
-        else:
-            flash('正式的職災資料，沒辦法刪除喔', category='error') 
-                    
-    # 進入修改頁面
-    elif 'edit' in request.values: 
-            wid = request.values.get('edit')                        
-            return redirect(url_for('views.viewWorkInjury', wid=wid))
-    
-    info_data = workInjury()        
     return render_template("home.html", info_data=info_data,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data, user=current_user)
+                                        agency_data = agency_data, 
+                                        user = current_user)
 
-@views.route('/home')
-def home():
-    return render_template("home.html", user=current_user)
-            
+
 # 新增職災基本資訊
 @views.route('/viewWorkInjury', methods=['GET', 'POST'])
+@login_required
 def viewWorkInjury():
     
     enterprise_data = enterprise()
     project_data = project()  
     injurytype_data = injurytype()
     agency_data = agency()
-    
-    # print("project_data",project_data)
-    # print("enterprise_data",enterprise_data)
-    # print("agency_data",agency_data)
-            
-    # 新增職災資料
-    if request.method == 'POST':         
+                
+    # 新增或編輯職災按鈕
+    if request.method == 'POST':
+             
         # 抓取form資料
         eid = request.values.get('eid')
         pid = request.values.get('pid')
@@ -188,67 +166,72 @@ def viewWorkInjury():
         
         wdate = str(datetime.strptime(wdate, '%Y-%m-%d'))
         format = 'yyyy/mm/dd hh24:mi:ss'
-        
-        print("request.form['submitBtn']",request.form['submitBtn'])
-        # 新增職災資訊
-        if request.form['submitBtn'] == "add":        
-            # 確認資料庫中wid不重複
-            cursor.prepare('SELECT * FROM WORKINJURY WHERE wId=:wid')
-            data = ""
-            while ( data != None): 
-                number = str(random.randrange( 10000, 99999))
-                wid = "w" + number             
-                cursor.execute(None, {'wid':wid})
-                data = cursor.fetchone()            
-            print(
-                wid,eid,pid,agencyname,
+                
+        # # 清理字串中的空白
+        location = stripStr(location)
+        note = stripStr(note)
+        address = stripStr(address)        
+                
+        # todo 如果錯的話，回到頁面沒辦法保存資料
+        # 輸入資料檢查
+        # note_len = 300 # 備註的字數
+        # if (len(eid) < 1):
+        #     flash('請輸入事業單位', category='error')
+        # elif len(agencyname) < 1:
+        #     flash('請輸入勞檢機構', category='error')            
+        #     # return
+        # elif len(iid) < 1:
+        #     flash('請輸入災害類型', category='error')        
+        # elif checkLenUf8(note,note_len):                
+        #     flash(f'備註欄位最多為{note_len}字', category='error')
+                
+        print(
+                eid,pid,agencyname,
                 iid,location,wdate,
                 num,note,address
             )
 
-            # 使用者沒有輸入
-            if (len(eid) < 1):
-                print("no eid",eid)
-                flash('請輸入事業單位', category='error')
-            elif len(agencyname) < 1:
-                print("no agencyname",agencyname)
-                flash('請輸入勞檢機構', category='error')            
-                # return
-            elif len(iid) < 1:
-                print("no iid",iid)
-                flash('請輸入災害類型', category='error')
-            else:                    
-                sql = """
-                        INSERT INTO workinjury w ( 
-                            wid,eid,pid,agencyname,
-                            iid,location,wdate,
-                            num,note,address)
-                        VALUES 
-                            (:wid, :eid, :pid, :agencyname,
-                            :iid,:location, TO_DATE( :wdate, :format ) , 
-                            :num, :note, :address )
-                    """
-                cursor.prepare(sql)
-                cursor.execute(None, {
-                    'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
-                    'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
-                    'num':num , 'note':note, 'address':address            
-                    })
-                connection.commit()
-                print("新增資料成功")
-                flash('新增資料成功！', category='success')
-                
-                info = show_workinjury(wid)
-                
-                # todo: 剛新增完抓不到資料
-                if info != None:
-                    return redirect(url_for('views.viewWorkInjury', data=info)) 
-                else:               
-                    return redirect(url_for('views.index', user=current_user))
+        # 按下新增職災按鈕
+        if request.form['submitBtn'] == "add":         
+            print('新增職災資料')
+            # 確認資料庫中wid不重複
+            cursor.prepare('SELECT * FROM WORKINJURY WHERE wId=:wid')
+            data = ""
+            while ( data != None): 
+                number = str(random.randrange(100000, 999999))
+                wid = "w" + number             
+                cursor.execute(None, {'wid':wid})
+                data = cursor.fetchone()       
 
-        else:
-            print("編輯職災資訊")          
-            wid = request.args['wid']  
+            sql = """
+                    INSERT INTO workinjury w ( 
+                        wid,eid,pid,agencyname,
+                        iid,location,wdate,
+                        num,note,address)
+                    VALUES 
+                        (:wid, :eid, :pid, :agencyname,
+                        :iid,:location, TO_DATE( :wdate, :format ) , 
+                        :num, :note, :address )
+                """
+            cursor.prepare(sql)
+            cursor.execute(None, {
+                'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
+                'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
+                'num':num , 'note':note, 'address':address            
+                })
+            connection.commit()
+            flash('新增資料成功！', category='success')            
+            
+            info = show_workinjury(wid)                
+            wid = info['wid']                                
+            if info != None:
+                return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
+            else:               
+                flash('資料庫發生問題，請聯繫管理員', category='error')
+
+        # 按下編輯職災按鈕
+        else:            
+            wid = request.args['wid']                        
             sql = """
                     UPDATE workinjury 
                     SET 
@@ -263,36 +246,36 @@ def viewWorkInjury():
                         address=:address
                     WHERE wid=:wid
                 """
+                
             cursor.prepare(sql)
             cursor.execute(None, {
                 'wid': wid, 'eid':eid, 'pid':pid, 'agencyname':agencyname,
                 'iid': iid, 'location':location, 'wdate':wdate, 'format':format,
                 'num':num , 'note':note, 'address':address            
                 })
+                        
             connection.commit()
             flash('更新資料成功！', category='success')
-            info = show_workinjury(wid)
-            print("info__after update",info)
-            
-            return redirect(url_for('views.viewWorkInjury', wid=wid))
+            info = show_workinjury(wid)            
+            return redirect(url_for('views.viewWorkInjury', wid=wid, user = current_user))
     else:
         # 編輯頁面
-        if 'wid' in request.args:        
-            wid = request.args['wid']
-            info = show_workinjury(wid)
-            print("進入編輯頁面")
+        if 'wid' in request.args:    
+            print("進入編輯頁面")    
+            wid = request.args['wid']    
+            info = show_workinjury(wid)            
             return render_template("viewWorkInjury.html", data=info,    
                                         enterprise_data = enterprise_data,
                                         project_data = project_data,
                                         injurytype_data = injurytype_data,
-                                        agency_data = agency_data)
+                                        agency_data = agency_data, user = current_user)
         else:
             # 進入新增頁面    
             return render_template("viewWorkInjury.html",    
                                             enterprise_data = enterprise_data,
                                             project_data = project_data,
                                             injurytype_data = injurytype_data,
-                                            agency_data = agency_data)
+                                            agency_data = agency_data, user = current_user)
 
 # 根據職災編號找資料
 def show_workinjury(wid):    
@@ -313,15 +296,11 @@ def show_workinjury(wid):
                 ON w.pid = p.pid                    
                 LEFT JOIN injurytype i
                 ON w.iid = i.iid
-
-            WHERE w.wid = :wid
-        """
-    cursor.prepare(sql)
-    cursor.execute(None, {'wid': wid})
-
+            WHERE w.wid = """ + "\'" + wid + "\'"
+        
+    cursor.execute(sql)
     data = cursor.fetchone()     
     if data != None:
-        data = [i.strip() if isinstance(i, str) else i for i in data]    
         info = {
                 'wid': data[0],
                 'pid': data[1],
@@ -338,8 +317,9 @@ def show_workinjury(wid):
                 'industryname': data[12],
                 'eid': data[13],
                 'note': data[14],
-        }
+        }                
         return info
+
     else:
         return None
 
@@ -348,7 +328,7 @@ def workInjury():
             SELECT 
                 w.wid,p.pid,i.iid, w.wdate,
                 i.injuryname, w.num,p.projectname,
-                e.enterprisename,w.agencyname
+                e.enterprisename,w.agencyname,e.eid
 
             FROM workinjury w                
                 LEFT JOIN enterprise e
@@ -377,6 +357,7 @@ def workInjury():
             'projectname': i[6],
             'enterprisename': i[7],
             'agencyname': i[8],
+            'eid': i[9],
         }
         info_data.append(info)
     return info_data
@@ -419,6 +400,91 @@ def agency():
         info_data.append(info)
     return info_data
 
+@views.route('/get_detail')
+def get_prediction():
+    word = request.values.get('word')
+    infotype = request.values.get('infotype')
+    if infotype == 'a':
+        result = agencyInfo(word)
+    elif infotype == 'e':
+        result = enterpriseInfo(word)
+    elif infotype == 'p':
+        result = projectInfo(word)    
+    return jsonify({'result':result})
+
+def enterpriseInfo(eid):
+    sql = """SELECT * 
+        FROM enterprise e
+            LEFT JOIN industry i
+            ON e.inid = i.inid
+        WHERE eid=:eid
+        """
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'eid':eid,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'eid': data[0],
+                'address': data[1],
+                'enterpriseno': data[2],
+                'principal': data[3],
+                'capital': data[4],
+                'inid': data[5],
+                'enterprisename': data[6],
+                'industryname': data[9],
+        }
+        return info
+    else:
+        return None    
+
+def projectInfo(pid):
+    sql = """
+        SELECT * 
+        FROM poject p       
+            LEFT JOIN enterprise e
+            ON p.eid = e.eid
+        WHERE pid=:pid
+    """
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'pid':pid,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'pid': data[0],
+                'projectname': data[1],
+                'eid': data[2],
+                'enterprisename': data[9],
+        }
+        return info
+    else:
+        return None    
+
+def agencyInfo(agencyname):
+    sql = "SELECT * FROM laboragency WHERE agencyname=:agencyname"
+    cursor.prepare(sql)
+    cursor.execute(None, {
+                    'agencyname':agencyname,
+                    })
+
+    data = cursor.fetchone()     
+    if data != None:
+        info = {
+                'agencyname': data[0],
+                'phone': data[1],
+                'address': data[2],
+                'area': data[3],
+                'url': data[4]
+        }
+        return info
+    else:
+        return None
+
 def enterprise():
     sql = "SELECT eid,enterprisename FROM enterprise"
     cursor.execute(sql)
@@ -434,10 +500,6 @@ def enterprise():
 
 
 # 統計職災基本資訊
-# @views.route('/plot', methods=['GET', 'POST'])
-# def plot():
-#     return render_template("plot.html")                   
-
 @views.route('/plot')
 def plot():
     revenue = []
@@ -514,5 +576,5 @@ def plot():
                             dataa = dataa, datab = datab,
                             datac = datac, 
                             nameList = nameList, 
-                            countList = countList
+                            countList = countList, user = current_user
                            )

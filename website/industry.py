@@ -4,6 +4,7 @@ import random, string
 from datetime import datetime
 from website import connectDB
 from flask_login import current_user,login_required
+from website.tool import checkLength
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -134,13 +135,18 @@ def viewIndustry():
                 data = cursor.fetchone()
 
 
-            # 使用者沒有輸入
+            # 使用者輸入判斷
             if (len(category) < 1):
                 print("no eid",category)
                 flash('請選擇行業類別', category='error')
-            elif len(industryName) < 1:
-                print("no industryName",industryName)
-                flash('請選擇行業名稱', category='error')            
+            elif (len(industryName) < 1 or checkLength(industryName,100)):
+                print("no industryName",industryName)     
+                flash('行業名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('industry.viewIndustry'))
+            elif (checkLength(industryDesc,1500)):
+                print("no industryDesc",industryDesc)    
+                flash('行業敘述內容過長!', category='error')
+                return redirect(url_for('industry.viewIndustry'))   
             else:
                 sql = """
                         INSERT INTO INDUSTRY 
@@ -166,28 +172,42 @@ def viewIndustry():
                 else:               
                     return redirect(url_for('industry.Industry'))
 
+
         # 編輯
         else:
             # inId = request.values.get('inId')
             inId = request.args['inId']
-            sql ="""
-                    UPDATE INDUSTRY
-                    SET
-                        CATEGORY = :category,
-                        INDUSTRYNAME = :industryName,
-                        INDUSTRYDESC = :industryDesc
-                    WHERE INID = :inId
-            """
-            cursor.execute(sql, {
-                'inId':inId, 'category': category, 
-                'industryName':industryName, 'industryDesc':industryDesc})
 
-            connection.commit()
-            flash('更新資料成功！', category='success')
-            info = show_industry(inId)
-            print("info__after update",info)
-            
-            return redirect(url_for('industry.Industry'))
+            if (len(category) < 1):
+                print("no eid",category)
+                flash('請選擇行業類別', category='error')
+            elif (len(industryName) < 1 or checkLength(industryName,100)):
+                print("no industryName",industryName)     
+                flash('行業名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('industry.Industry'))
+            elif (checkLength(industryDesc,1500)):
+                print("no industryDesc",industryDesc)    
+                flash('行業敘述內容過長!', category='error')
+                return redirect(url_for('industry.Industry'))   
+            else:
+                sql ="""
+                        UPDATE INDUSTRY
+                        SET
+                            CATEGORY = :category,
+                            INDUSTRYNAME = :industryName,
+                            INDUSTRYDESC = :industryDesc
+                        WHERE INID = :inId
+                """
+                cursor.execute(sql, {
+                    'inId':inId, 'category': category, 
+                    'industryName':industryName, 'industryDesc':industryDesc})
+
+                connection.commit()
+                flash('更新資料成功！', category='success')
+                info = show_industry(inId)
+                print("info__after update",info)
+                
+                return redirect(url_for('industry.Industry'))
     else:
         # 編輯頁面
         if 'inId' in request.args:        

@@ -4,6 +4,7 @@ import random, string
 from datetime import datetime
 from website import connectDB
 from flask_login import current_user,login_required
+from website.tool import checkLength
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -130,10 +131,15 @@ def viewInjury():
                 data = cursor.fetchone()
 
 
-            # 使用者沒有輸入
-            if len(injuryName) < 1:
+            # 使用者輸入確認資料長度
+            if (len(injuryName) < 1 or checkLength(injuryName,100)):
                 print("no injuryName",injuryName)
-                flash('請輸入災害名稱', category='error')            
+                flash('災害名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('injury.viewInjury'))
+            elif (checkLength(injuryDesc,800)):
+                print("no injuryDesc",injuryDesc)    
+                flash('災害敘述內容過長!', category='error')
+                return redirect(url_for('injury.viewInjury'))            
             else:
                 sql = """
                         INSERT INTO INJURYTYPE 
@@ -159,27 +165,38 @@ def viewInjury():
                 else:               
                     return redirect(url_for('injury.Injury'))
 
+
         # 編輯
         else:
             # inId = request.values.get('inId')
             iId = request.args['iId']
-            sql ="""
-                    UPDATE INJURYTYPE
-                    SET
-                        INJURYNAME = :injuryName,
-                        INJURYDESC = :injuryDesc
-                    WHERE IID = :iId
-            """
-            cursor.execute(sql, {
-                'iId':iId, 'injuryName': injuryName, 
-                'injuryDesc':injuryDesc})
+            if (len(injuryName) < 1 or checkLength(injuryName,100)):
+                print("no injuryName",injuryName)
+                flash('災害名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('injury.Injury'))
+            elif (checkLength(injuryDesc,800)):
+                print("no injuryDesc",injuryDesc)    
+                flash('災害敘述內容過長!', category='error')
+                return redirect(url_for('injury.Injury'))
+            else:
+                sql ="""
+                        UPDATE INJURYTYPE
+                        SET
+                            INJURYNAME = :injuryName,
+                            INJURYDESC = :injuryDesc
+                        WHERE IID = :iId
+                """
+                cursor.execute(sql, {
+                    'iId':iId, 'injuryName': injuryName, 
+                    'injuryDesc':injuryDesc})
 
-            connection.commit()
-            flash('更新資料成功！', category='success')
-            info = show_injury(iId)
-            print("info__after update",info)
-            
-            return redirect(url_for('injury.Injury'))
+                connection.commit()
+                flash('更新資料成功！', category='success')
+                info = show_injury(iId)
+                print("info__after update",info)
+                
+                return redirect(url_for('injury.Injury'))
+
     else:
         # 編輯頁面
         if 'iId' in request.args:        
@@ -230,4 +247,5 @@ def show_injury(iId):
         return info
     else:
         return None
+
 

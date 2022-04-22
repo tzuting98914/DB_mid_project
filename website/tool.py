@@ -14,3 +14,4 @@ def checkLength(text,max):
     other_len = len(text)-chinese_len
     total_len = chinese_len*4 + other_len
     return total_len > max
+

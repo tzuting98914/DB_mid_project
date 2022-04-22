@@ -10,7 +10,7 @@
 
 
 {% block content %}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">詳細資訊</h6>
@@ -36,7 +36,7 @@
                     *<text>勞動檢查機構名稱</text>
                 </label><br>
                 {% if data %}
-                    <textarea class="form-control" rows="1" name="agencyName">{{ data.agencyName }}</textarea> 
+                    <textarea class="form-control" rows="1" name="agencyName" readonly=True>{{ data.agencyName }}</textarea> 
                 {% else %}
                     <textarea class="form-control" rows="1" name="agencyName"></textarea>
                 {% endif %}
@@ -51,9 +51,9 @@
                             <text>電話</text>
                         </label><br>
                         {% if data %}
-                            <textarea class="form-control" rows="1" name="phone">{{ data.phone }}</textarea> 
+                            <textarea class="form-control" rows="1" name="phone" minlength="10" maxlength="12" onkeyup="this.value=this.value.replace(/[ a-zA-Z\u4e00-\u9fa5]/g,'')">{{ data.phone }}</textarea> 
                         {% else %}
-                            <textarea class="form-control" rows="1" name="phone"></textarea>
+                            <textarea class="form-control" rows="1" name="phone" minlength="10" maxlength="12" onkeyup="this.value=this.value.replace(/[ a-zA-Z\u4e00-\u9fa5]/g,'')"></textarea>
                         {% endif %}
 
                         </select> 
@@ -65,9 +65,9 @@
                             <text>網址</text>
                         </label><br>
                         {% if data %}
-                            <textarea class="form-control" rows="1" name="url">{{ data.url }}</textarea> 
+                            <textarea class="form-control" rows="1" name="url" maxlength="150"  onkeyup="this.value=this.value.replace(/[ \u4e00-\u9fa5]/g,'')">{{ data.url }}</textarea> 
                         {% else %}
-                            <textarea class="form-control" rows="1" name="url"></textarea>
+                            <textarea class="form-control" rows="1" name="url" maxlength="150"  onkeyup="this.value=this.value.replace(/[ \u4e00-\u9fa5]/g,'')"></textarea>
                         {% endif %}
                         </select> 
                     </div>
@@ -96,13 +96,18 @@
                     <text>地址</text>
                 </label><br>
                 {% if data %}
-                    <textarea class="form-control" rows="1" minlength = "2" name="address">{{ data.address }}</textarea> 
+                    <textarea class="form-control" rows="1" name="address">{{ data.address }}</textarea> 
                 {% else %}
-                    <textarea class="form-control" rows="1" minlength = "2" name="address"></textarea>
+                    <textarea class="form-control" rows="1" name="address"></textarea>
                 {% endif %}
                 </select> 
             </div>
+                
+            
+            
 
+            
+   
             {% if type=="add" %}
             <button class="btn btn-info" type="submit" name="submitBtn" value="add">
                 新增資料
@@ -118,10 +123,4 @@
             </a>
         </form>        
     </div>
-
-    <script>
-
-
-
-    </script>
 {% endblock %}

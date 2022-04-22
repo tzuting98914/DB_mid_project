@@ -4,6 +4,7 @@ import random, string
 from datetime import datetime
 from website import connectDB
 from flask_login import current_user,login_required
+from website.tool import checkLength
 
 connection = connectDB()
 cursor = connection.cursor()
@@ -142,10 +143,19 @@ def viewAgency():
                 data = cursor.fetchone()
 
 
-            # 使用者沒有輸入
-            if len(agencyName) < 1:
+            # 使用者輸入判斷
+            if (len(agencyName) < 2 or checkLength(agencyName,60)):
                 print("no agencyName",agencyName)
-                flash('請輸入勞檢單位名稱', category='error')            
+                flash('勞檢單位名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('agency.viewAgency'))
+            elif (checkLength(address,200)):
+                print("no address",address)
+                flash('地址內容過長!', category='error')
+                return redirect(url_for('agency.viewAgency'))  
+            elif (checkLength(area,800)):
+                print("no area",area)
+                flash('檢查責任區域內容過長!', category='error')
+                return redirect(url_for('agency.viewAgency'))          
             else:
                 sql = """
                         INSERT INTO LABORAGENCY 
@@ -175,25 +185,39 @@ def viewAgency():
         else:
             # inId = request.values.get('inId')
             agencyName = request.args['agencyName']
-            sql ="""
-                    UPDATE LABORAGENCY
-                    SET
-                        PHONE = :phone,
-                        ADDRESS = :address,
-                        AREA = :area,
-                        URL = :url
-                    WHERE AGENCYNAME = :agencyName
-            """
-            cursor.execute(sql, {
-                'agencyName': agencyName, 'phone':phone, 'address':address,
-                'area':area, 'url':url})
 
-            connection.commit()
-            flash('更新資料成功！', category='success')
-            info = show_agency(agencyName)
-            print("info__after update",info)
-            
-            return redirect(url_for('agency.Agency',data_agencyName=data_agencyName))
+            if (len(agencyName) < 1 or checkLength(agencyName,60)):
+                print("no agencyName",agencyName)
+                flash('勞檢單位名稱未輸入或內容過長!', category='error')
+                return redirect(url_for('agency.Agency',data_agencyName=data_agencyName))
+            elif (checkLength(address,200)):
+                print("no address",address)
+                flash('地址內容過長!', category='error')
+                return redirect(url_for('agency.Agency',data_agencyName=data_agencyName)) 
+            elif (checkLength(area,800)):
+                print("no area",area)
+                flash('檢查責任區域內容過長!', category='error')
+                return redirect(url_for('agency.Agency',data_agencyName=data_agencyName))          
+            else:
+                sql ="""
+                        UPDATE LABORAGENCY
+                        SET
+                            PHONE = :phone,
+                            ADDRESS = :address,
+                            AREA = :area,
+                            URL = :url
+                        WHERE AGENCYNAME = :agencyName
+                """
+                cursor.execute(sql, {
+                    'agencyName': agencyName, 'phone':phone, 'address':address,
+                    'area':area, 'url':url})
+
+                connection.commit()
+                flash('更新資料成功！', category='success')
+                info = show_agency(agencyName)
+                print("info__after update",info)
+                
+                return redirect(url_for('agency.Agency',data_agencyName=data_agencyName))
     else:
         # 編輯頁面
         if 'agencyName' in request.args:        
@@ -248,4 +272,5 @@ def show_agency(agencyName):
         return info
     else:
         return None
+
 

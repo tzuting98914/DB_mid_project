@@ -231,4 +231,3 @@ def show_injury(iId):
     else:
         return None
 
-

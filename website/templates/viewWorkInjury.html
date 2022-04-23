@@ -142,7 +142,7 @@
 
             <div class="form-group">
                 <label class="small mb-1">
-                    <text>肇事位置</text>
+                    <text>肇事位置（限100字）</text>
                 </label>
                     {% if data %}
                         <textarea class="form-control" id='location' rows="2" name="location" maxlength = "100">{{ data.location if data.location is not none}}</textarea>
@@ -153,7 +153,7 @@
 
             <div class="form-group">
                 <label class="small mb-1">
-                    <text>肇事地址</text>
+                    <text>肇事地址（限100字）</text>
                 </label>                                                    
                     {% if data %}
                         <textarea class="form-control" id='address' rows="2" name="address" maxlength = "100">{{ data.address if data.address is not none}}</textarea> 
@@ -164,7 +164,7 @@
 
             <div class="form-group">
                 <label class="small mb-1">
-                    <text>備註</text>
+                    <text>備註（限100字）</text>
                 </label>
                     {% if data %}
                         <textarea class="form-control" id='note' rows="2" name="note" maxlength = "100">{{ data.note if data.note is not none}}</textarea>
